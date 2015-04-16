@@ -1,0 +1,15 @@
+{
+  "name": "jsGameBoy",
+  "bugs": {
+    "url": "https://github.com/jtrinklein/jsGameBoy/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jtrinklein/jsGameBoy.git"
+  },
+  "version": "0.0.1",
+  "author": "James Trinklein",
+  "dependencies": {
+    "gcd-js": "0.0.2"
+  }
+}
