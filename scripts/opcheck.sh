@@ -1,7 +1,8 @@
 i=0
 j=0
 report="---- "
-
+d=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )
+file="${d}/opcode.h"
 while (( i++ < 255 )); do {
     if (( j++ == 15 ))
     then
@@ -11,7 +12,7 @@ while (( i++ < 255 )); do {
 
     code=$(printf "0x%.2x" $i)
     search="OP(${code})"
-    result=$(grep -i $search ../opcode.h)
+    result=$(grep -i $search $file)
     if [[ "x${result}x" == "xx" ]]
     then
         report="${report}${code} "

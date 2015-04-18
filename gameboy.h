@@ -23,7 +23,10 @@ extern "C" {
 #define FLAG_H      0x20       /* 1: Halfcarry               */
 #define FLAG_C      0x10       /* 1: Carry/Borrow occured    */
 
-#define IF_HALT     0x01
+#define IF_HALT     0x01       /* 1: halt enabled            */
+#define IF_STOP     0x02       /* 1: stop enabled            */
+#define IF_IE       0x04       /* 1: interrupts enabled      */
+
 
 typedef unsigned char byte;
 typedef unsigned short word;

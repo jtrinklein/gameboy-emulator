@@ -4,7 +4,13 @@
 OP(0x00) // noop
 END
 
+OP(0x76) // HALT
+    cpu->IF |= IF_HALT;
+END
 
+OP(0x10)
+    cpu->IF |= IF_STOP;
+END
 
 // LD (xx), A
 OP(0x02) // LD (BC), A
@@ -16,11 +22,13 @@ OP(0x12) // LD (DE), A
 END
 
 OP(0x22) // LD (HL+), A
-    WRITE(cpu->HL.W+1, cpu->AF.B.h);
+    WRITE(cpu->HL.W, cpu->AF.B.h);
+    cpu->HL.W++;
 END
 
 OP(0x32) // LD (HL-), A
-    WRITE(cpu->HL.W-1, cpu->AF.B.h);
+    WRITE(cpu->HL.W, cpu->AF.B.h);
+    cpu->HL.W--;
 END
 
 // LD (HL), x
@@ -294,11 +302,25 @@ OP(0x1A) // LD A, (DE)
 END
 
 OP(0x2A) // LD A, (HL+)
-    cpu->AF.B.h = READ(cpu->HL.W+1);
+    cpu->AF.B.h = READ(cpu->HL.W);
+    cpu->HL.W++;
 END
 
 OP(0x3A) // LD A, (HL-)
-    cpu->AF.B.h = READ(cpu->HL.W-1);
+    cpu->AF.B.h = READ(cpu->HL.W);
+    cpu->HL.W--;
+END
+
+OP(0xFA) // LD A, (nn)
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
+    cpu->AF.B.h = READ(J.W);
+END
+
+OP(0xEA) // LD (nn), A
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
+    WRITE(J.W, cpu->AF.B.h);
 END
 
 
@@ -373,8 +395,8 @@ OP(0x2C) // INC L
 END
 
 OP(0x3C) // INC A
-    cpu->AF.B.l++;
-    SET_INC_FLAGS(cpu->AF.B.l);
+    cpu->AF.B.h++;
+    SET_INC_FLAGS(cpu->AF.B.h);
 END
 
 // DEC x
@@ -474,6 +496,55 @@ OP(0x1F) // RRA
     cpu->AF.B.l = I;
 END
 
+// JP
+OP(0xC3) // JP nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
+    cpu->PC.W = J.W;
+END
+
+OP(0xE9) // JP (HL)
+    cpu->PC.W = READ(cpu->HL.W);
+END
+
+OP(0xC2) // JP NZ, nn
+    if ((cpu->AF.B.l&FLAG_Z) == 0) {
+        cpu->ICycles += 4;
+        J.B.h = READ_INC();
+        J.B.l = READ_INC();
+        cpu->PC.W = J.W;
+    }
+END
+
+OP(0xD2) // JP NC, nn
+    if ((cpu->AF.B.l&FLAG_C) == 0) {
+        cpu->ICycles += 4;
+        J.B.h = READ_INC();
+        J.B.l = READ_INC();
+        cpu->PC.W = J.W;
+    }
+END
+
+OP(0xCA) // JP Z, nn
+    if (cpu->AF.B.l&FLAG_Z) {
+        cpu->ICycles += 4;
+        J.B.h = READ_INC();
+        J.B.l = READ_INC();
+        cpu->PC.W = J.W;
+    }
+END
+
+OP(0xDA) // JP C, nn
+    if (cpu->AF.B.l&FLAG_C) {
+        cpu->ICycles += 4;
+        J.B.h = READ_INC();
+        J.B.l = READ_INC();
+        cpu->PC.W = J.W;
+    }
+END
+
+
+// JR
 OP(0x18) // JR n
     I = READ_INC();
     cpu->PC.W += ((signedbyte)I) + 1; // +1 for read_inc()
@@ -512,10 +583,19 @@ OP(0x38) // JR C, n
 END
 
 OP(0x08) // LD (nn), SP
-    J.B.l = READ_INC();
     J.B.h = READ_INC();
+    J.B.l = READ_INC();
     WRITE(J.W, cpu->SP.B.l);
     WRITE(J.W+1, cpu->SP.B.h);
+END
+
+OP(0xF9) // LD SP, HL
+    cpu->SP.W = cpu->HL.W;
+END
+
+OP(0xF8) // LD HL, SP+n
+    cpu->HL.W = cpu->SP.W + ((signedbyte)READ_INC());
+    cpu->AF.B.l = ((cpu->HL.B.l&0x08)>(cpu->SP.B.l&0x08)?FLAG_H:0)|((cpu->HL.B.l&0x80)>(cpu->SP.B.l&0x80)?FLAG_C:0);
 END
 
 // ADD xx, yy
@@ -577,43 +657,6 @@ OP(0xC6) // ADD A, n
     ADD_A(READ_INC());
 END
 
-// ADC A, x
-OP(0x88) // ADC A, B
-    ADC_A(cpu->BC.B.h);
-END
-
-OP(0x89) // ADC A, C
-    ADC_A(cpu->BC.B.l);
-END
-
-OP(0x8A) // ADC A, D
-    ADC_A(cpu->DE.B.h);
-END
-
-OP(0x8B) // ADC A, E
-    ADC_A(cpu->DE.B.l);
-END
-
-OP(0x8C) // ADC A, H
-    ADC_A(cpu->HL.B.h);
-END
-
-OP(0x8D) // ADC A, L
-    ADC_A(cpu->HL.B.l);
-END
-
-OP(0x8E) // ADC A, A
-    ADC_A(cpu->AF.B.h);
-END
-
-OP(0x8F) // ADC A, (HL)
-    ADC_A(READ(cpu->HL.W));
-END
-
-OP(0xCE) // ADC A, n
-    ADC_A(READ_INC());
-END
-
 // SUB A, x
 OP(0x90) // SUB A, B
     SUB_A(cpu->BC.B.h);
@@ -651,30 +694,383 @@ OP(0xD6) // SUB A, n
     SUB_A(READ_INC());
 END
 
+// AND A, x
+OP(0xA0) // AND A, B
+    AND_A(cpu->BC.B.h);
+END
+
+OP(0xA1) // AND A, C
+    AND_A(cpu->BC.B.l);
+END
+
+OP(0xA2) // AND A, D
+    AND_A(cpu->DE.B.h);
+END
+
+OP(0xA3) // AND A, E
+    AND_A(cpu->DE.B.l);
+END
+
+OP(0xA4) // AND A, H
+    AND_A(cpu->HL.B.h);
+END
+
+OP(0xA5) // AND A, L
+    AND_A(cpu->HL.B.l);
+END
+
+OP(0xA7) // AND A, A
+    AND_A(cpu->AF.B.h);
+END
+
+OP(0xA6) // AND A, (HL)
+    AND_A(READ(cpu->HL.W));
+END
+
+OP(0xE6) // AND A, n
+    AND_A(READ_INC());
+END
+
+// OR A, x
+OP(0xB0) // OR A, B
+    OR_A(cpu->BC.B.h);
+END
+
+OP(0xB1) // OR A, C
+    OR_A(cpu->BC.B.l);
+END
+
+OP(0xB2) // OR A, D
+    OR_A(cpu->DE.B.h);
+END
+
+OP(0xB3) // OR A, E
+    OR_A(cpu->DE.B.l);
+END
+
+OP(0xB4) // OR A, H
+    OR_A(cpu->HL.B.h);
+END
+
+OP(0xB5) // OR A, L
+    OR_A(cpu->HL.B.l);
+END
+
+OP(0xB7) // OR A, A
+    OR_A(cpu->AF.B.h);
+END
+
+OP(0xB6) // OR A, (HL)
+    OR_A(READ(cpu->HL.W));
+END
+
+OP(0xF6) // OR A, n
+    OR_A(READ_INC());
+END
+
+// ADC A, x
+OP(0x88) // ADC A, B
+    ADC_A(cpu->BC.B.h);
+END
+
+OP(0x89) // ADC A, C
+    ADC_A(cpu->BC.B.l);
+END
+
+OP(0x8A) // ADC A, D
+    ADC_A(cpu->DE.B.h);
+END
+
+OP(0x8B) // ADC A, E
+    ADC_A(cpu->DE.B.l);
+END
+
+OP(0x8C) // ADC A, H
+    ADC_A(cpu->HL.B.h);
+END
+
+OP(0x8D) // ADC A, L
+    ADC_A(cpu->HL.B.l);
+END
+
+OP(0x8E) // ADC A, A
+    ADC_A(cpu->AF.B.h);
+END
+
+OP(0x8F) // ADC A, (HL)
+    ADC_A(READ(cpu->HL.W));
+END
+
+OP(0xCE) // ADC A, n
+    ADC_A(READ_INC());
+END
+
+// SBC A, x
+OP(0x98) // SBC A, B
+    SBC_A(cpu->BC.B.h);
+END
+
+OP(0x99) // SBC A, C
+    SBC_A(cpu->BC.B.l);
+END
+
+OP(0x9A) // SBC A, D
+    SBC_A(cpu->DE.B.h);
+END
+
+OP(0x9B) // SBC A, E
+    SBC_A(cpu->DE.B.l);
+END
+
+OP(0x9C) // SBC A, H
+    SBC_A(cpu->HL.B.h);
+END
+
+OP(0x9D) // SBC A, L
+    SBC_A(cpu->HL.B.l);
+END
+
+OP(0x9E) // SBC A, A
+    SBC_A(cpu->AF.B.h);
+END
+
+OP(0x9F) // SBC A, (HL)
+    SBC_A(READ(cpu->HL.W));
+END
+
+OP(0xDE) // SBC A, n
+    SBC_A(READ_INC());
+END
+
+// XOR A, x
+OP(0xA8) // XOR A, B
+    XOR_A(cpu->BC.B.h);
+END
+
+OP(0xA9) // XOR A, C
+    XOR_A(cpu->BC.B.l);
+END
+
+OP(0xAA) // XOR A, D
+    XOR_A(cpu->DE.B.h);
+END
+
+OP(0xAB) // XOR A, E
+    XOR_A(cpu->DE.B.l);
+END
+
+OP(0xAC) // XOR A, H
+    XOR_A(cpu->HL.B.h);
+END
+
+OP(0xAD) // XOR A, L
+    XOR_A(cpu->HL.B.l);
+END
+
+OP(0xAE) // XOR A, A
+    XOR_A(cpu->AF.B.h);
+END
+
+OP(0xAF) // XOR A, (HL)
+    XOR_A(READ(cpu->HL.W));
+END
+
+OP(0xEE) // XOR A, n
+    XOR_A(READ_INC());
+END
+
+// CP A, x
+OP(0xB8) // CP A, B
+    CP_A(cpu->BC.B.h);
+END
+
+OP(0xB9) // CP A, C
+    CP_A(cpu->BC.B.l);
+END
+
+OP(0xBA) // CP A, D
+    CP_A(cpu->DE.B.h);
+END
+
+OP(0xBB) // CP A, E
+    CP_A(cpu->DE.B.l);
+END
+
+OP(0xBC) // CP A, H
+    CP_A(cpu->HL.B.h);
+END
+
+OP(0xBD) // CP A, L
+    CP_A(cpu->HL.B.l);
+END
+
+OP(0xBE) // CP A, A
+    CP_A(cpu->AF.B.h);
+END
+
+OP(0xBF) // CP A, (HL)
+    CP_A(READ(cpu->HL.W));
+END
+
+OP(0xFE) // CP A, n
+    CP_A(READ_INC());
+END
+
+// POP xx
+OP(0xC1) // POP BC
+    POP(cpu->BC);
+END
+
+OP(0xD1) // POP DE
+    POP(cpu->DE);
+END
+
+OP(0xE1) // POP HL
+    POP(cpu->HL);
+END
+
+OP(0xF1) // POP AF
+    POP(cpu->AF);
+END
+
+// PUSH xx
+OP(0xC5) // PUSH BC
+    PUSH(cpu->BC);
+END
+
+OP(0xD5) // PUSH DE
+    PUSH(cpu->DE);
+END
+
+OP(0xE5) // PUSH HL
+    PUSH(cpu->HL);
+END
+
+OP(0xF5) // PUSH AF
+    PUSH(cpu->AF);
+END
+
+// RST
+OP(0xC7) // RST 0x00
+    PUSH(cpu->PC);
+    cpu->PC.W = 0x0000;
+END
+
+OP(0xD7) // RST 0x10
+    PUSH(cpu->PC);
+    cpu->PC.W = 0x0010;
+END
+
+OP(0xE7) // RST 0x20
+    PUSH(cpu->PC);
+    cpu->PC.W = 0x0020;
+END
+
+OP(0xF7) // RST 0x30
+    PUSH(cpu->PC);
+    cpu->PC.W = 0x0030;
+END
+
+OP(0xCF) // RST 0x08
+    PUSH(cpu->PC);
+    cpu->PC.W = 0x0008;
+END
+
+OP(0xDF) // RST 0x18
+    PUSH(cpu->PC);
+    cpu->PC.W = 0x0018;
+END
+
+OP(0xEF) // RST 0x28
+    PUSH(cpu->PC);
+    cpu->PC.W = 0x0028;
+END
+
+OP(0xFF) // RST 0x38
+    PUSH(cpu->PC);
+    cpu->PC.W = 0x0038;
+END
+
+// RET
+OP(0xC9) // RET
+    RET();
+END
+
+OP(0xD9) // RETI
+    RET();
+    cpu->IF |= IF_IE;
+END
+
+OP(0xC8) // RET Z
+    if (cpu->AF.B.l&FLAG_Z) {
+        cpu->ICycles += 12;
+        RET();
+    }
+END
+
+OP(0xD8) // RET C
+    if (cpu->AF.B.l&FLAG_C) {
+        cpu->ICycles += 12;
+        RET();
+    }
+END
+
+OP(0xC0) // RET NZ
+    if ((cpu->AF.B.l&FLAG_Z) == 0) {
+        cpu->ICycles += 12;
+        RET();
+    }
+END
+
+OP(0xD0) // RET NC
+    if ((cpu->AF.B.l&FLAG_C) == 0) {
+        cpu->ICycles += 12;
+        RET();
+    }
+END
+
 // LD xx, nn
 OP(0x01) // LD BC, nn
-    cpu->BC.B.l = READ_INC();
     cpu->BC.B.h = READ_INC();
+    cpu->BC.B.l = READ_INC();
 END
 
 OP(0x11) // LD DE, nn
-    cpu->DE.B.l = READ_INC();
     cpu->DE.B.h = READ_INC();
+    cpu->DE.B.l = READ_INC();
 END
 
 OP(0x21) // LD HL, nn
-    cpu->HL.B.l = READ_INC();
     cpu->HL.B.h = READ_INC();
+    cpu->HL.B.l = READ_INC();
 END
 
 OP(0x31) // LD SP, nn
-    cpu->SP.B.l = READ_INC();
     cpu->SP.B.h = READ_INC();
+    cpu->SP.B.l = READ_INC();
 END
 
+OP(0xE2) // LD (C), A
+    WRITE(0xFF00+cpu->BC.B.l, cpu->AF.B.h);
+END
+
+
+OP(0xF2) // LD A, (C)
+    cpu->AF.B.h = READ(0xFF00+cpu->BC.B.l);
+END
+
+OP(0xE0) // LDH (n), A
+    WRITE(0xFF00+READ_INC(), cpu->AF.B.h);
+END
+
+OP(0xF0) // LD A, (n)
+    cpu->AF.B.h = READ(0xFF00+READ_INC());
+END
+
+
 OP(0x2F) // CPL
-    cpu->AF.B.h = ~(cpu->AF.B.h);
-    cpu->AF.B.l = cpu->AF.B.l|FLAG_N|FLAG_H;
+    cpu->AF.B.l = ~(cpu->AF.B.h);
+    cpu->AF.B.h = cpu->AF.B.l|FLAG_N|FLAG_H;
 END
 
 OP(0x3F) // CCF
@@ -685,7 +1081,115 @@ OP(0x37) // SCF
     cpu->AF.B.l = (cpu->AF.B.l&FLAG_Z)|FLAG_C;
 END
 
+OP(0xCB) // CB Prefix
+    ExecCB(cpu);
+END
 
+OP(0xE8) // ADD SP, n
+    cpu->SP.W += (signedbyte)READ_INC();
+END
+
+// CALL
+OP(0xCD) // CALL nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
+    PUSH(cpu->PC);
+    cpu->PC.W = J.W;
+END
+
+OP(0xC4) // CALL NZ, nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
+    if ((cpu->AF.B.l&FLAG_Z) == 0) {
+        cpu->ICycles += 12;
+        PUSH(cpu->PC);
+        cpu->PC.W = J.W;
+    }
+END
+
+OP(0xCC) // CALL Z, nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
+    if (cpu->AF.B.l&FLAG_Z) {
+        cpu->ICycles += 12;
+        PUSH(cpu->PC);
+        cpu->PC.W = J.W;
+    }
+END
+
+OP(0xD4) // CALL NC, nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
+    if ((cpu->AF.B.l&FLAG_C) == 0) {
+        cpu->ICycles += 12;
+        PUSH(cpu->PC);
+        cpu->PC.W = J.W;
+    }
+END
+
+OP(0xDC) // CALL C, nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
+    if (cpu->AF.B.l&FLAG_C) {
+        cpu->ICycles += 12;
+        PUSH(cpu->PC);
+        cpu->PC.W = J.W;
+    }
+END
+
+// Interrupt Enable/disable
+OP(0xF3) // ID
+    cpu->IF &= (~IF_IE);
+END
+
+OP(0xFB) // IE
+    cpu->IF |= IF_IE;
+END
+
+// Illegals
+OP(0xD3) // illegal
+    ILLEGAL(0xD3);
+END
+
+OP(0xE3) // illegal
+    ILLEGAL(0xE3);
+END
+
+OP(0xDB) // illegal
+    ILLEGAL(0xDB);
+END
+
+OP(0xEB) // illegal
+    ILLEGAL(0xEB);
+END
+
+OP(0xF4) // illegal
+    ILLEGAL(0xF4);
+END
+
+OP(0xE4) // illegal
+    ILLEGAL(0xE4);
+END
+
+OP(0xFC) // illegal
+    ILLEGAL(0xFC);
+END
+
+OP(0xFD) // illegal
+    ILLEGAL(0xFD);
+END
+
+OP(0xEC) // illegal
+    ILLEGAL(0xEC);
+END
+
+OP(0xED) // illegal
+    ILLEGAL(0xED);
+END
+
+OP(0xDD) // illegal
+    ILLEGAL(0xDD);
+END
 
 #undef OP
 #undef END
