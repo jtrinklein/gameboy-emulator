@@ -52,6 +52,7 @@ const int INITIAL_PC = 0;
 void runGB(CPU* gb);
 
 word interruptCheck(CPU* gb);
+void go();
 #ifdef __cplusplus
 }
 #endif
