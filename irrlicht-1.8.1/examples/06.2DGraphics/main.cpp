@@ -110,7 +110,7 @@ int main()
 	{
 		if (r->device->isWindowActive())
 		{
-            r->renderStep();
+            r->renderStep(8);
 		}
 	}
 

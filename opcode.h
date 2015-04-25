@@ -1,3 +1,6 @@
+#ifndef __OPCODE_H__
+#define __OPCODE_H__
+
 #define OP(x) case x:
 #define END break;
 
@@ -475,25 +478,19 @@ END
 
 //ROTATE
 OP(0x07) // RLCA
-    cpu->AF.B.l = (cpu->AF.B.h&0x80)?FLAG_C:0;
-    cpu->AF.B.h = (cpu->AF.B.h<<1)|((cpu->AF.B.l&FLAG_C)?0x01:0);
+    RLC_X(cpu->AF.B.h);
 END
 
 OP(0x17) // RLA
-    I = (cpu->AF.B.h & 0x80)?FLAG_C:0;
-    cpu->AF.B.h = (cpu->AF.B.h<<1)|((cpu->AF.B.l&FLAG_C)?0x01:0);
-    cpu->AF.B.l = I;
+    RL_X(cpu->AF.B.h);
 END
 
 OP(0x0F) // RRCA
-    cpu->AF.B.l = (cpu->AF.B.h&0x01)?FLAG_C:0;
-    cpu->AF.B.h = (cpu->AF.B.h>>1)|((cpu->AF.B.l&FLAG_C)?0x80:0);
+    RRC_X(cpu->AF.B.h);
 END
 
 OP(0x1F) // RRA
-    I = (cpu->AF.B.h & 0x01)?FLAG_C:0;
-    cpu->AF.B.h = (cpu->AF.B.h>>1)|((cpu->AF.B.l&FLAG_C)?0x80:0);
-    cpu->AF.B.l = I;
+    RR_X(cpu->AF.B.h);
 END
 
 // JP
@@ -509,7 +506,8 @@ END
 
 OP(0xC2) // JP NZ, nn
     if ((cpu->AF.B.l&FLAG_Z) == 0) {
-        cpu->ICycles += 4;
+        cpu->ICycles -= 4;
+        cpu->opCycles += 4;
         J.B.h = READ_INC();
         J.B.l = READ_INC();
         cpu->PC.W = J.W;
@@ -518,7 +516,8 @@ END
 
 OP(0xD2) // JP NC, nn
     if ((cpu->AF.B.l&FLAG_C) == 0) {
-        cpu->ICycles += 4;
+        cpu->ICycles -= 4;
+        cpu->opCycles += 4;
         J.B.h = READ_INC();
         J.B.l = READ_INC();
         cpu->PC.W = J.W;
@@ -527,7 +526,8 @@ END
 
 OP(0xCA) // JP Z, nn
     if (cpu->AF.B.l&FLAG_Z) {
-        cpu->ICycles += 4;
+        cpu->ICycles -= 4;
+        cpu->opCycles += 4;
         J.B.h = READ_INC();
         J.B.l = READ_INC();
         cpu->PC.W = J.W;
@@ -536,7 +536,8 @@ END
 
 OP(0xDA) // JP C, nn
     if (cpu->AF.B.l&FLAG_C) {
-        cpu->ICycles += 4;
+        cpu->ICycles -= 4;
+        cpu->opCycles += 4;
         J.B.h = READ_INC();
         J.B.l = READ_INC();
         cpu->PC.W = J.W;
@@ -547,13 +548,14 @@ END
 // JR
 OP(0x18) // JR n
     I = READ_INC();
-    cpu->PC.W += ((signedbyte)I) + 1; // +1 for read_inc()
+    cpu->PC.W += ((signedbyte)I); 
 END
 
 OP(0x20) // JR NZ, n
     I = READ_INC();
     if ((cpu->AF.B.l & FLAG_Z) == 0) {
-        cpu->ICycles += 4;
+        cpu->ICycles -= 4;
+        cpu->opCycles+= 4;
         cpu->PC.W += ((signedbyte)I);
     }
 END
@@ -561,7 +563,7 @@ END
 OP(0x28) // JR Z, n
     I = READ_INC();
     if (cpu->AF.B.l & FLAG_Z) {
-        cpu->ICycles += 4;
+        cpu->ICycles -= 4; cpu->opCycles += 4;
         cpu->PC.W += ((signedbyte)I);
     }
 END
@@ -569,7 +571,7 @@ END
 OP(0x30) // JR NC, n
     I = READ_INC();
     if ((cpu->AF.B.l & FLAG_C) == 0) {
-        cpu->ICycles += 4;
+        cpu->ICycles -= 4; cpu->opCycles += 4;
         cpu->PC.W += ((signedbyte)I);
     }
 END
@@ -577,7 +579,7 @@ END
 OP(0x38) // JR C, n
     I = READ_INC();
     if (cpu->AF.B.l & FLAG_C) {
-        cpu->ICycles += 4;
+        cpu->ICycles -= 4; cpu->opCycles += 4;
         cpu->PC.W += ((signedbyte)I);
     }
 END
@@ -993,7 +995,8 @@ END
 
 // RET
 OP(0xC9) // RET
-    RET();
+    POP(J);
+    cpu->PC.W = J.W;
 END
 
 OP(0xD9) // RETI
@@ -1003,28 +1006,32 @@ END
 
 OP(0xC8) // RET Z
     if (cpu->AF.B.l&FLAG_Z) {
-        cpu->ICycles += 12;
+        cpu->ICycles -= 12;
+        cpu->opCycles += 12;
         RET();
     }
 END
 
 OP(0xD8) // RET C
     if (cpu->AF.B.l&FLAG_C) {
-        cpu->ICycles += 12;
+        cpu->ICycles -= 12;
+        cpu->opCycles += 12;
         RET();
     }
 END
 
 OP(0xC0) // RET NZ
     if ((cpu->AF.B.l&FLAG_Z) == 0) {
-        cpu->ICycles += 12;
+        cpu->ICycles -= 12;
+        cpu->opCycles += 12;
         RET();
     }
 END
 
 OP(0xD0) // RET NC
     if ((cpu->AF.B.l&FLAG_C) == 0) {
-        cpu->ICycles += 12;
+        cpu->ICycles -= 12;
+        cpu->opCycles += 12;
         RET();
     }
 END
@@ -1101,7 +1108,8 @@ OP(0xC4) // CALL NZ, nn
     J.B.h = READ_INC();
     J.B.l = READ_INC();
     if ((cpu->AF.B.l&FLAG_Z) == 0) {
-        cpu->ICycles += 12;
+        cpu->ICycles -= 12;
+        cpu->opCycles += 12;
         PUSH(cpu->PC);
         cpu->PC.W = J.W;
     }
@@ -1111,7 +1119,8 @@ OP(0xCC) // CALL Z, nn
     J.B.h = READ_INC();
     J.B.l = READ_INC();
     if (cpu->AF.B.l&FLAG_Z) {
-        cpu->ICycles += 12;
+        cpu->ICycles -= 12;
+        cpu->opCycles += 12;
         PUSH(cpu->PC);
         cpu->PC.W = J.W;
     }
@@ -1121,7 +1130,8 @@ OP(0xD4) // CALL NC, nn
     J.B.h = READ_INC();
     J.B.l = READ_INC();
     if ((cpu->AF.B.l&FLAG_C) == 0) {
-        cpu->ICycles += 12;
+        cpu->ICycles -= 12;
+        cpu->opCycles += 12;
         PUSH(cpu->PC);
         cpu->PC.W = J.W;
     }
@@ -1131,7 +1141,8 @@ OP(0xDC) // CALL C, nn
     J.B.h = READ_INC();
     J.B.l = READ_INC();
     if (cpu->AF.B.l&FLAG_C) {
-        cpu->ICycles += 12;
+        cpu->ICycles -= 12;
+        cpu->opCycles += 12;
         PUSH(cpu->PC);
         cpu->PC.W = J.W;
     }
@@ -1193,3 +1204,4 @@ END
 
 #undef OP
 #undef END
+#endif

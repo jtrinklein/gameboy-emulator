@@ -2,7 +2,7 @@ i=0
 j=0
 report="---- "
 d=$( cd "$( dirname "${BASH_SOURCE[0]}" )/../" && pwd )
-file="${d}/opcode.h"
+file="${d}/opcodeCB.h"
 while (( i++ < 255 )); do {
     if (( j++ == 15 ))
     then

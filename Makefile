@@ -5,7 +5,7 @@ LDFLAGS="-stdlib=libstdc++"
 LDLIBS=/usr/local/lib
 OBJ=libcarts.o cart.o gameboy.o
 ROBJ=testrender.o render.o
-irOBJ=
+testOBJ=cpu_test.o render_mock.o
 
 gbemu: clean $(OBJ)
 	$(CC) $(CXXFLAGS) -o $@ $(OBJ)
@@ -24,6 +24,7 @@ cart.o: cart.cpp
 
 gameboy.o: gameboy.cpp
 
+cputest: clean cpu_test.o render_mock.o
 .PHONY: clean
 clean:
 	-rm $(OBJ) $(ROBJ) testrender gbemu

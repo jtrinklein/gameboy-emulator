@@ -3,7 +3,8 @@
 
 using namespace irr;
 
-Render::Render(byte* vram) {
+Render::Render(byte* vram, byte* oam) {
+    this->OAM = oam;
     this->VRAM = vram;
     this->bgtile = 0;
     this->init();
@@ -11,20 +12,30 @@ Render::Render(byte* vram) {
     this->SCX = 0;
     this->SCY = 0;
     this->bgmap = 0;
-    this->useTileset0();
-    
+    this->bgtile = 0;
+    this->clock = 0;
+    this->setLCD(0x81);
+    this->mode = MODE_OAM_READ;
 }
+
 #define PIXEL_WIDTH 160
 #define PIXEL_HEIGHT 144
 #define WINDOW_SCALE 3
+
 Render::~Render() {
 }
 
 void Render::init() {
-    this->palette[0] = video::SColor(PIXEL_WHITE);
-    this->palette[1] = video::SColor(PIXEL_LIGHT_GREY);
-    this->palette[2] = video::SColor(PIXEL_DARK_GREY);
-    this->palette[3] = video::SColor(PIXEL_BLACK);
+    this->colors[COLOR_BLACK] = video::SColor(PIXEL_BLACK);
+    this->colors[COLOR_DARK_GREY] = video::SColor(PIXEL_DARK_GREY);
+    this->colors[COLOR_LIGHT_GREY] = video::SColor(PIXEL_LIGHT_GREY);
+    this->colors[COLOR_WHITE] = video::SColor(PIXEL_WHITE);
+    
+    this->palette[0] = COLOR_WHITE;
+    this->palette[1] = COLOR_LIGHT_GREY;
+    this->palette[2] = COLOR_DARK_GREY;
+    this->palette[3] = COLOR_BLACK;
+    
     this->device = irr::createDevice(video::EDT_OPENGL, core::dimension2d< u32 >(PIXEL_WIDTH*WINDOW_SCALE, PIXEL_HEIGHT*WINDOW_SCALE));
     this->driver = this->device->getVideoDriver();
     this->screenImage = driver->createImage(video::ECF_A8R8G8B8, core::dimension2d< u32 >(PIXEL_WIDTH, PIXEL_HEIGHT));
@@ -41,32 +52,47 @@ video::SColor Render::getPixelColor(pair tile, byte pixelIdx) {
     //low byte is second pixel section - (high bit)
     // pixel 0 is highest bit
     byte colorIdx = (((tile.B.l >> (7 - pixelIdx)) & 0x01)<< 1) | ((tile.B.h >> (7 - pixelIdx)) & 0x01);
-    return this->palette[colorIdx];
+    return this->colors[this->palette[colorIdx]];
 }
 
 pair Render::getTileRow(byte idx, byte rowIdx) {
-    word addr = this->addrBase + (this->bgtile == 1 ? idx : (signedbyte)idx)*16 + rowIdx*2;
+    word addr = this->tileBase + (this->bgtile ? idx : (signedbyte)idx)*16 + rowIdx*2;
 
     pair p;
     p.B.h = this->readVRAM(addr);
     p.B.l = this->readVRAM(addr + 1);
     return p;
 }
-void Render::useTileset0() {
-    this->addrBase = TILESET_O_BASE_ADDR;
-    this->bgtile = 0;
+
+bool Render::running() {
+    return this->device && this->device->run();
 }
-void Render::useTileset1() {
-    this->addrBase = TILESET_1_BASE_ADDR;
-    this->bgtile = 1;
+
+void Render::useTileset(byte id) {
+    if(id) {
+        this->tileBase = TILESET_1_BASE_ADDR;
+        this->bgtile = 1;
+    } else {
+        this->tileBase = TILESET_O_BASE_ADDR;
+        this->bgtile = 0;
+    }
 }
+
+void Render::useBgMap(byte id) {
+    this->bgmap = id;
+    this->mapBase =id ? BGMAP_1_BASE_ADDR : BGMAP_0_BASE_ADDR;
+    
+
+}
+
 byte Render::readVRAM(word addr) {
     return this->VRAM[VRAM_BASE_ADDR + addr];
 }
 
 #define GRID 0
+
 void Render::updateScreenPixel(u32 pixelX, byte pixelY, video::SColor color) {
-//    this->screenImage->setPixel(pixelX, (u32)pixelY, color);
+
 #if GRID
     if(pixelX%8 == 0 || pixelY%8 == 0) {
         this->texture[pixelX + (u32)pixelY*160] = this->palette[1].color;
@@ -84,7 +110,7 @@ void Render::renderScanline() {
     this->texture = (u32*)this->screenTexture->lock();
     
     // VRAM offset for the tile map
-    word mapoffset = this->bgtile == 1 ? BGMAP_1_BASE_ADDR : BGMAP_0_BASE_ADDR;
+    word mapoffset = this->mapBase;
         
     // Which line of tiles to use in the map
     byte rowoffset = ((this->scanline + this->SCY) & 0xFF) >> 3;// y / 8 = y >> 3
@@ -133,13 +159,74 @@ void Render::drawScreen() {
     this->driver->endScene();
 }
 
-void Render::renderStep() {
-    if(this->scanline < PIXEL_HEIGHT) {
-        this->renderScanline();
-        this->scanline++;
-    } else {
-        this->drawScreen();
-        this->scanline = 0;
+byte Render::getLCD() {
+    return this->LCD;
+}
+
+void Render::setLCD(byte data) {
+    this->LCD = data;
+    this->bgEnabled = data & 1;
+    this->spritesEnabled = (data >> 1) & 1;
+    this->largeSprites = (data >> 2) & 1;
+    this->useBgMap((data >> 3) & 1);
+    this->useTileset((data >> 4) & 1);
+    this->windowEnabled = (data >> 5) & 1;
+    this->windowMap = (data >> 6) & 1;
+    this->displayEnabled = (data >> 7) & 1;
+}
+
+void Render::setPalette(byte data) {
+    this->palette[0] = data & 3;
+    this->palette[1] = (data >> 1) & 3;
+    this->palette[2] = (data >> 2) & 3;
+    this->palette[3] = (data >> 3) & 3;
+}
+
+#define OAM_CYCLES 80
+#define VRAM_CYCLES 172
+#define HBLANK_CYCLES 204
+#define VBLANK_CYCLES 456
+
+
+void Render::renderStep(byte cycleDelta) {
+    this->clock += cycleDelta;
+    
+    switch (this->mode) {
+        case MODE_OAM_READ:
+            if(this->clock >= OAM_CYCLES) {
+                this->clock -= OAM_CYCLES;
+                this->mode = MODE_VRAM_READ;
+            }
+            break;
+        case MODE_VRAM_READ:
+            if(this->clock >= VRAM_CYCLES) {
+                this->clock -= VRAM_CYCLES;
+                this->mode = MODE_HBLANK;
+                this->renderScanline();
+            }
+            break;
+        case MODE_HBLANK:
+            if (this->clock >= HBLANK_CYCLES) {
+                this->clock -= HBLANK_CYCLES;
+                this->scanline++;
+                if (this->scanline < PIXEL_HEIGHT) {
+                    this->mode = MODE_OAM_READ;
+                } else {
+                    this->mode = MODE_VBLANK;
+                    this->drawScreen();
+                }
+            }
+            break;
+        case MODE_VBLANK:
+            if(this->clock >= VBLANK_CYCLES) {
+                this->clock -= VBLANK_CYCLES;
+                this->scanline++;
+                if (this->scanline == (PIXEL_HEIGHT + 10)) {
+                    this->mode = MODE_OAM_READ;
+                    this->scanline = 0;
+                }
+            }
+            break;
     }
 }
 

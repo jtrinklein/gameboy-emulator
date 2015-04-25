@@ -1054,6 +1054,7 @@
 		95E5859312FCE3A1004946C6 /* CTRStencilShadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5859112FCE3A1004946C6 /* CTRStencilShadow.cpp */; };
 		95E5859512FCE3F5004946C6 /* CSMFMeshFileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5859412FCE3F5004946C6 /* CSMFMeshFileLoader.cpp */; };
 		95E5859612FCE3F5004946C6 /* CSMFMeshFileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5859412FCE3F5004946C6 /* CSMFMeshFileLoader.cpp */; };
+		A40361E01AEC3A6B007DEF1E /* cpu_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A40361DE1AEC3A6B007DEF1E /* cpu_tests.cpp */; };
 		A43963601AE6A07900F8197F /* cart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A43963581AE6A07900F8197F /* cart.cpp */; };
 		A43963611AE6A07900F8197F /* gameboy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A439635B1AE6A07900F8197F /* gameboy.cpp */; };
 		A43963621AE6A07900F8197F /* cpu_instrs.gb in Resources */ = {isa = PBXBuildFile; fileRef = A439635F1AE6A07900F8197F /* cpu_instrs.gb */; };
@@ -2099,6 +2100,8 @@
 		95E9D50610F42FDF008546FE /* jdarith.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jdarith.c; path = ../jpeglib/jdarith.c; sourceTree = SOURCE_ROOT; };
 		95E9D50A10F43011008546FE /* jaricom.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = jaricom.c; path = ../jpeglib/jaricom.c; sourceTree = SOURCE_ROOT; };
 		95E9D50E10F43194008546FE /* CNPKReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = CNPKReader.cpp; path = ../CNPKReader.cpp; sourceTree = SOURCE_ROOT; };
+		A40361DE1AEC3A6B007DEF1E /* cpu_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cpu_tests.cpp; sourceTree = "<group>"; };
+		A41DBC1A1AE9DEBB009B41D6 /* bios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bios.h; path = ../../../bios.h; sourceTree = "<group>"; };
 		A43963581AE6A07900F8197F /* cart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cart.cpp; path = ../../../cart.cpp; sourceTree = "<group>"; };
 		A43963591AE6A07900F8197F /* cart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cart.h; path = ../../../cart.h; sourceTree = "<group>"; };
 		A439635A1AE6A07900F8197F /* cycles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cycles.h; path = ../../../cycles.h; sourceTree = "<group>"; };
@@ -3444,6 +3447,8 @@
 		4C00548C0A48470500C844C2 /* 06.2DGraphics */ = {
 			isa = PBXGroup;
 			children = (
+				A40361DD1AEC3A6B007DEF1E /* tests */,
+				A41DBC1A1AE9DEBB009B41D6 /* bios.h */,
 				A43963581AE6A07900F8197F /* cart.cpp */,
 				A43963591AE6A07900F8197F /* cart.h */,
 				A439635A1AE6A07900F8197F /* cycles.h */,
@@ -3736,6 +3741,15 @@
 			name = include;
 			path = ../../../include;
 			sourceTree = SOURCE_ROOT;
+		};
+		A40361DD1AEC3A6B007DEF1E /* tests */ = {
+			isa = PBXGroup;
+			children = (
+				A40361DE1AEC3A6B007DEF1E /* cpu_tests.cpp */,
+			);
+			name = tests;
+			path = ../../../tests;
+			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
@@ -5005,6 +5019,7 @@
 			files = (
 				A43963611AE6A07900F8197F /* gameboy.cpp in Sources */,
 				4CF146F70A486668006EBA03 /* main.cpp in Sources */,
+				A40361E01AEC3A6B007DEF1E /* cpu_tests.cpp in Sources */,
 				A46F890D1AE56E99002A2DCE /* render.cpp in Sources */,
 				A43963601AE6A07900F8197F /* cart.cpp in Sources */,
 			);
@@ -6121,6 +6136,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = ../../../include;
@@ -6138,6 +6155,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_64_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "compiler-default";
+				CLANG_CXX_LIBRARY = "compiler-default";
 				GCC_DYNAMIC_NO_PIC = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = YES;
