@@ -1,11 +1,13 @@
 #include <iostream>
-#include <map>
+#include <iomanip>
 #include <functional>
 #include "tests.h"
 #include "gameboy.h"
 #include "render.h"
 
 using namespace std;
+unsigned assertFail = 0;
+unsigned assertPass = 0;
 CPU* cpu;
 string dots = "........................................";
 #define ID_NEQUAL 1
@@ -14,29 +16,42 @@ string dots = "........................................";
 #define JOIN(x,y) x##y
 
 #define eql(actual, expected) \
-    if(actual == expected) {\
-        return;\
+do {\
+    if(actual != expected) {\
+        assertFail++;\
+        cout << "FAIL" << endl;\
+        cout << STR(actual) << " != " << STR(expected) << endl;\
+        cout << hex << actual << " should equal " << expected << endl;\
+    } else {\
+        assertPass++;\
     }\
-    cout << "FAIL" << endl;\
-    cout << STR(actual) << endl;\
-    cout << hex << actual << " should equal " << expected << endl;\
-    throw ID_NEQUAL
+} while(false)
 
-#define fset(f) eql((cpu->AF.B.h & f), f)
+#define fnotset(f) eql((cpu->AF.B.l & f), 0)
+
+#define fset(f) eql((cpu->AF.B.l & f), f)
 #define TEST(fn)\
 beforeTest();\
-try {\
+do {\
+    unsigned oldPass = assertPass, oldFail = assertFail;\
     cout << #fn << dots.substr(0, 40 - getTitleLength( #fn ));\
     fn();\
-    pass++;\
-    cout << "OK" << endl;\
-} catch(...) {\
-    fail++;\
-}\
-tests++
+    if(oldFail == assertFail) {\
+        pass++;\
+        if (assertPass == oldPass) {\
+            cout << "WARN" << endl;\
+            cout << "0 assertions run" << endl;\
+        } else {\
+            cout << "OK" << endl;\
+        }\
+    } else {\
+        fail++;\
+    }\
+    tests++;\
+} while(false)
 
 
-int getTitleLength(string title) {
+unsigned long getTitleLength(string title) {
     return title.length();
 }
 
@@ -102,11 +117,14 @@ void CALL() {
     rom(0x100, 0xCD);//CALL a16
     rom(0x101, 0x34);
     rom(0x102, 0x12);//0x1234
+    rom(0x103, 0x00);//NOP
     
     runOps(ops);
     
     eql(cpu->PC.W, 0x1234);
-    eql(cpu->SP.W, 0xDFFE);
+    eql(cpu->SP.W, 0xDFFD);
+    eql(read(0xDFFE), 0x03);
+    eql(read(0xDFFF), 0x01);
 }
 
 void CALL_Z() {
@@ -121,7 +139,9 @@ void CALL_Z() {
     runOps(ops);
     
     eql(cpu->PC.W, 0x1234);
-    eql(cpu->SP.W, 0xDFFE);
+    eql(cpu->SP.W, 0xDFFD);
+    eql(read(0xDFFE), 0x03);
+    eql(read(0xDFFF), 0x01);
 }
 
 
@@ -153,7 +173,9 @@ void CALL_NZ() {
     runOps(ops);
     
     eql(cpu->PC.W, 0x1234);
-    eql(cpu->SP.W, 0xDFFE);
+    eql(cpu->SP.W, 0xDFFD);
+    eql(read(0xDFFE), 0x03);
+    eql(read(0xDFFF), 0x01);
 }
 
 
@@ -185,7 +207,9 @@ void CALL_C() {
     runOps(ops);
     
     eql(cpu->PC.W, 0x1234);
-    eql(cpu->SP.W, 0xDFFE);
+    eql(cpu->SP.W, 0xDFFD);
+    eql(read(0xDFFE), 0x03);
+    eql(read(0xDFFF), 0x01);
 }
 
 
@@ -217,7 +241,9 @@ void CALL_NC() {
     runOps(ops);
     
     eql(cpu->PC.W, 0x1234);
-    eql(cpu->SP.W, 0xDFFE);
+    eql(cpu->SP.W, 0xDFFD);
+    eql(read(0xDFFE), 0x03);
+    eql(read(0xDFFF), 0x01);
 }
 
 void CALL_NC_NOJUMP() {
@@ -247,7 +273,7 @@ void CALL_RET() {
     runOps(ops);
     
     eql(cpu->PC.W, 0x103);
-    eql(cpu->SP.W, 0xDFFE);
+    eql(cpu->SP.W, 0xDFFF);
 }
 
 
@@ -529,12 +555,11 @@ void JR_NC_NOJUMP() {
     
     eql(cpu->PC.W, 0x102);
 }
-
 void PUSH_BC() {
     byte ops = 1;
     
-    cpu->BC.W = 0x1C80;
-
+    cpu->BC.W = 0x0C80;
+    
     rom(0x100, 0xC5); //PUSH bc
     rom(0x101, 0x00); //NOP
     rom(0xDFFF, 0x00);
@@ -544,14 +569,14 @@ void PUSH_BC() {
     
     eql(cpu->PC.W, 0x101);
     eql(cpu->SP.W, 0xDFFD);
-    eql(read(0xDFFF), 0x80);
-    eql(read(0xDFFE), 0x0C);
+    eql(read(0xDFFE), 0x80); // low bytes written second
+    eql(read(0xDFFF), 0x0C); // high bytes written first
 }
 void PUSH_DE() {
     byte ops = 1;
     
     cpu->DE.W = 0x0C80;
-
+    
     rom(0x100, 0xD5); //PUSH de
     rom(0x101, 0x00); //NOP
     rom(0xDFFF, 0x00);
@@ -561,14 +586,14 @@ void PUSH_DE() {
     
     eql(cpu->PC.W, 0x101);
     eql(cpu->SP.W, 0xDFFD);
-    eql(read(0xDFFF), 0x80);
-    eql(read(0xDFFE), 0x0C);
+    eql(read(0xDFFE), 0x80);
+    eql(read(0xDFFF), 0x0C);
 }
 void PUSH_HL() {
     byte ops = 1;
     
     cpu->HL.W = 0x8CFF;
-
+    
     rom(0x100, 0xE5); //PUSH HL
     rom(0x101, 0x00); //NOP
     rom(0xDFFF, 0x00);
@@ -578,8 +603,93 @@ void PUSH_HL() {
     
     eql(cpu->PC.W, 0x101);
     eql(cpu->SP.W, 0xDFFD);
-    eql(read(0xDFFF), 0x80);
-    eql(read(0xDFFE), 0x0C);
+    eql(read(0xDFFE), 0xFF);
+    eql(read(0xDFFF), 0x8C);
+}
+void PUSH_AF() {
+    byte ops = 1;
+    
+    cpu->AF.W = 0x8C1F;
+    
+    rom(0x100, 0xF5); //PUSH AF
+    rom(0x101, 0x00); //NOP
+    rom(0xDFFF, 0x00);
+    rom(0xDFFE, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x101);
+    eql(cpu->SP.W, 0xDFFD);
+    eql(read(0xDFFE), 0x1F);
+    eql(read(0xDFFF), 0x8C);
+}
+void POP_BC() {
+    byte ops = 1;
+    
+    cpu->SP.W = 0xDFFD;
+    cpu->BC.W = 0x0000;
+
+    rom(0x100, 0xC1); //POP bc
+    rom(0x101, 0x00); //NOP
+    rom(0xDFFF, 0x80);
+    rom(0xDFFE, 0x0C);
+    
+    runOps(ops);
+
+    eql(cpu->PC.W, 0x101);
+    eql(cpu->SP.W, 0xDFFF);
+    eql(cpu->BC.W, 0x800C);
+}
+void POP_DE() {
+    byte ops = 1;
+    
+    cpu->SP.W = 0xDFFD;
+    cpu->DE.W = 0x0C80;
+
+    rom(0x100, 0xD1); //POP de
+    rom(0x101, 0x00); //NOP
+    rom(0xDFFF, 0x80);
+    rom(0xDFFE, 0x0C);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x101);
+    eql(cpu->SP.W, 0xDFFF);
+    eql(cpu->DE.W, 0x800C);
+}
+void POP_HL() {
+    byte ops = 1;
+    
+    cpu->SP.W = 0xDFFD;
+    cpu->HL.W = 0x0000;
+
+    rom(0x100, 0xE1); //POP HL
+    rom(0x101, 0x00); //NOP
+    rom(0xDFFF, 0xFF);
+    rom(0xDFFE, 0x8C);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x101);
+    eql(cpu->SP.W, 0xDFFF);
+    eql(cpu->HL.W, 0xFF8C);
+}
+void POP_AF() {
+    byte ops = 1;
+    
+    cpu->SP.W = 0xDFFD;
+    cpu->AF.W = 0x0000;
+    
+    rom(0x100, 0xF1); //POP AF
+    rom(0x101, 0x00); //NOP
+    rom(0xDFFF, 0x31);
+    rom(0xDFFE, 0xF6);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x101);
+    eql(cpu->SP.W, 0xDFFF);
+    eql(cpu->AF.W, 0x31F6);
 }
 void RET() {
     byte ops = 1;
@@ -592,9 +702,284 @@ void RET() {
     
     runOps(ops);
 
-    //eql(cpu->PC.W, 0x1FF);
+    eql(cpu->PC.W, 0x1FF);
 }
 
+void LD_BC() {
+    byte ops = 1;
+    cpu->BC.W = 0x0000;
+    
+    rom(0x100, 0x01);//LD bc
+    rom(0x101, 0xF0);
+    rom(0x102, 0x80);//0x80F0
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x103);
+    eql(cpu->BC.W, 0x80F0);
+}
+void LD_DE() {
+    byte ops = 1;
+    cpu->DE.W = 0x0000;
+    
+    rom(0x100, 0x11);//LD de
+    rom(0x101, 0xF0);
+    rom(0x102, 0x80);//0x80F0
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x103);
+    eql(cpu->DE.W, 0x80F0);
+}
+void LD_HL() {
+    byte ops = 1;
+    cpu->HL.W = 0x0000;
+    
+    rom(0x100, 0x21);//LD hl
+    rom(0x101, 0xF0);
+    rom(0x102, 0x80);//0x80F0
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x103);
+    eql(cpu->HL.W, 0x80F0);
+}
+void LD_SP() {
+    byte ops = 1;
+    
+    rom(0x100, 0x31);//LD sp
+    rom(0x101, 0xF0);
+    rom(0x102, 0x80);//0x80F0
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x103);
+    eql(cpu->SP.W, 0x80F0);
+}
+
+void LD_B() {
+    byte ops = 1;
+    cpu->BC.W = 0x0000;
+    
+    rom(0x100, 0x06);//LD b
+    rom(0x101, 0xF2);//0xF2
+    rom(0x102, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x102);
+    eql(cpu->BC.B.h, 0xF2);
+}
+
+void LD_D() {
+    byte ops = 1;
+    cpu->BC.W = 0x0000;
+    
+    rom(0x100, 0x16);//LD d
+    rom(0x101, 0xF2);//0xF2
+    rom(0x102, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x102);
+    eql(cpu->DE.B.h, 0xF2);
+}
+void LD_H() {
+    byte ops = 1;
+    cpu->HL.W = 0x0000;
+    
+    rom(0x100, 0x26);//LD h
+    rom(0x101, 0xF2);//0xF2
+    rom(0x102, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x102);
+    eql(cpu->HL.B.h, 0xF2);
+}
+void LD_xHL() {
+    byte ops = 1;
+    cpu->HL.W = 0x1234;
+    
+    rom(0x100, 0x36);//LD (hl)
+    rom(0x101, 0xF2);//0xF2
+    rom(0x1234, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x102);
+    eql(read(0x1234), 0xF2);
+}
+
+void LD_C() {
+    byte ops = 1;
+    cpu->BC.W = 0x0000;
+    
+    rom(0x100, 0x0E);//LD c
+    rom(0x101, 0xF2);//0xF2
+    rom(0x102, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x102);
+    eql(cpu->BC.B.l, 0xF2);
+}
+
+void LD_E() {
+    byte ops = 1;
+    cpu->DE.W = 0x0000;
+    
+    rom(0x100, 0x1E);//LD e
+    rom(0x101, 0xF2);//0xF2
+    rom(0x102, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x102);
+    eql(cpu->DE.B.l, 0xF2);
+}
+void LD_L() {
+    byte ops = 1;
+    cpu->HL.W = 0x0000;
+    
+    rom(0x100, 0x2E);//LD l
+    rom(0x101, 0xF2);//0xF2
+    rom(0x102, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x102);
+    eql(cpu->HL.B.l, 0xF2);
+}
+void LD_A() {
+    byte ops = 1;
+    cpu->HL.W = 0x0000;
+    
+    rom(0x100, 0x3E);//LD a
+    rom(0x101, 0xF2);//0xF2
+    rom(0x102, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->PC.W, 0x102);
+    eql(cpu->AF.B.h, 0xF2);
+}
+void INC_B() {
+    byte ops = 1;
+    cpu->BC.B.h = 0x06;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x04);// INC B
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.h, 0x07);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void INC_B_HSET() {
+    byte ops = 1;
+    cpu->BC.B.h = 0x0F;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x04);// INC B
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.h, 0x10);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void INC_B_NOHSET() {
+    byte ops = 1;
+    cpu->BC.B.h = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x04);// INC B
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.h, 0x11);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+
+void INC_B_ZSET() {
+    byte ops = 1;
+    cpu->BC.B.h = 0xFF;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x04);// INC B
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.h, 0x00);
+    fnotset(FLAG_N);
+    fset(FLAG_Z);
+    fset(FLAG_H);
+}
+void INC_D() {
+    byte ops = 1;
+    cpu->DE.B.h = 0x06;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x14);// INC D
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.h, 0x07);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void INC_D_HSET() {
+    byte ops = 1;
+    cpu->DE.B.h = 0x0F;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x14);// INC D
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.h, 0x10);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void INC_D_NOHSET() {
+    byte ops = 1;
+    cpu->DE.B.h = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x14);// INC D
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.h, 0x11);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+
+void INC_D_ZSET() {
+    byte ops = 1;
+    cpu->DE.B.h = 0xFF;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x14);// INC D
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.h, 0x00);
+    fnotset(FLAG_N);
+    fset(FLAG_Z);
+    fset(FLAG_H);
+}
 void RunAllCpuTests(void) {
     word tests = 0, pass = 0, fail = 0;
     cpu = setup();
@@ -602,6 +987,11 @@ void RunAllCpuTests(void) {
     TEST(PUSH_BC);
     TEST(PUSH_DE);
     TEST(PUSH_HL);
+    TEST(PUSH_AF);
+    TEST(POP_BC);
+    TEST(POP_DE);
+    TEST(POP_HL);
+    TEST(POP_AF);
     TEST(CALL);
     TEST(CALL_RET);
     TEST(CALL_Z);
@@ -631,12 +1021,32 @@ void RunAllCpuTests(void) {
     TEST(JR_NC);
     TEST(JR_NC_NOJUMP);
     TEST(RET);
+    TEST(LD_BC);
+    TEST(LD_DE);
+    TEST(LD_HL);
+    TEST(LD_SP);
+    TEST(LD_B);
+    TEST(LD_D);
+    TEST(LD_H);
+    TEST(LD_xHL);
+    TEST(LD_C);
+    TEST(LD_E);
+    TEST(LD_L);
+    TEST(LD_A);
+    TEST(INC_B);
+    TEST(INC_B_HSET);
+    TEST(INC_B_NOHSET);
+    TEST(INC_B_ZSET);
+    TEST(INC_D);
+    TEST(INC_D_HSET);
+    TEST(INC_D_NOHSET);
+    TEST(INC_D_ZSET);
     
     cleanup(cpu);
     cout << dec;
-    cout << "ran:  " << tests << endl;
-    cout << "pass: " << pass << endl;
-    cout << "fail: " << fail << endl;
+    cout << "ran:  " << setw(3) << tests << setw(8) << "(" << setw(4) << assertPass+assertFail << " assertions)" << endl;
+    cout << "pass: " << setw(3) << pass <<  setw(8) << "(" << setw(4) << assertPass << " assertions)" << endl;
+    cout << "fail: " << setw(3) << fail <<  setw(8) << "(" << setw(4) << assertFail << " assertions)" << endl;
 }
 
 #ifdef BUILD_TEST
