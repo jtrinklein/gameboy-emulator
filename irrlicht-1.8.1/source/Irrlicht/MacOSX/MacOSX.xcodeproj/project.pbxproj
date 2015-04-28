@@ -918,7 +918,6 @@
 		95E5859312FCE3A1004946C6 /* CTRStencilShadow.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5859112FCE3A1004946C6 /* CTRStencilShadow.cpp */; };
 		95E5859512FCE3F5004946C6 /* CSMFMeshFileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5859412FCE3F5004946C6 /* CSMFMeshFileLoader.cpp */; };
 		95E5859612FCE3F5004946C6 /* CSMFMeshFileLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 95E5859412FCE3F5004946C6 /* CSMFMeshFileLoader.cpp */; };
-		A40361E91AEC526E007DEF1E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A40361E81AEC526E007DEF1E /* main.cpp */; };
 		A40361F11AEC535D007DEF1E /* cpu_instrs.gb in Resources */ = {isa = PBXBuildFile; fileRef = A439635F1AE6A07900F8197F /* cpu_instrs.gb */; };
 		A40361F21AEC535D007DEF1E /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 4C53E1650A484C2C0014E966 /* MainMenu.nib */; };
 		A40361F41AEC535D007DEF1E /* gameboy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A439635B1AE6A07900F8197F /* gameboy.cpp */; };
@@ -932,6 +931,11 @@
 		A40361FE1AEC535D007DEF1E /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0930CE550EC39F4500D63866 /* IOKit.framework */; };
 		A40362251AEC56B0007DEF1E /* cpu_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A40362241AEC56B0007DEF1E /* cpu_tests.cpp */; };
 		A40362261AEC56B0007DEF1E /* cpu_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A40362241AEC56B0007DEF1E /* cpu_tests.cpp */; };
+		A43361561AEF14B100ACA82D /* cpu_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A40362241AEC56B0007DEF1E /* cpu_tests.cpp */; settings = {COMPILER_FLAGS = "-D BUILD_TEST=1"; }; };
+		A43361571AEF14B100ACA82D /* cart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A43963581AE6A07900F8197F /* cart.cpp */; };
+		A43361581AEF14B100ACA82D /* gameboy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A439635B1AE6A07900F8197F /* gameboy.cpp */; settings = {COMPILER_FLAGS = "-D BUILD_TEST=1"; }; };
+		A433615A1AEF14E000ACA82D /* mock_render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A43361591AEF14E000ACA82D /* mock_render.cpp */; settings = {COMPILER_FLAGS = "-D BUILD_TEST=1"; }; };
+		A433615C1AEF15D400ACA82D /* GBCarts.c in Sources */ = {isa = PBXBuildFile; fileRef = A433615B1AEF15D400ACA82D /* GBCarts.c */; };
 		A43963601AE6A07900F8197F /* cart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A43963581AE6A07900F8197F /* cart.cpp */; };
 		A43963611AE6A07900F8197F /* gameboy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A439635B1AE6A07900F8197F /* gameboy.cpp */; };
 		A43963621AE6A07900F8197F /* cpu_instrs.gb in Resources */ = {isa = PBXBuildFile; fileRef = A439635F1AE6A07900F8197F /* cpu_instrs.gb */; };
@@ -1746,6 +1750,8 @@
 		A40362241AEC56B0007DEF1E /* cpu_tests.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cpu_tests.cpp; path = ../../../tests/cpu_tests.cpp; sourceTree = "<group>"; };
 		A40362271AEC56CD007DEF1E /* tests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tests.h; path = ../../../tests/tests.h; sourceTree = "<group>"; };
 		A41DBC1A1AE9DEBB009B41D6 /* bios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bios.h; path = ../../../bios.h; sourceTree = "<group>"; };
+		A43361591AEF14E000ACA82D /* mock_render.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = mock_render.cpp; path = ../../../../tests/mock_render.cpp; sourceTree = "<group>"; };
+		A433615B1AEF15D400ACA82D /* GBCarts.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = GBCarts.c; path = ../../../../EMULib/GBCarts.c; sourceTree = "<group>"; };
 		A43963581AE6A07900F8197F /* cart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cart.cpp; path = ../../../cart.cpp; sourceTree = "<group>"; };
 		A43963591AE6A07900F8197F /* cart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cart.h; path = ../../../cart.h; sourceTree = "<group>"; };
 		A439635A1AE6A07900F8197F /* cycles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cycles.h; path = ../../../cycles.h; sourceTree = "<group>"; };
@@ -1837,6 +1843,8 @@
 		0867D691FE84028FC02AAC07 /* MacOSX */ = {
 			isa = PBXGroup;
 			children = (
+				A433615B1AEF15D400ACA82D /* GBCarts.c */,
+				A43361591AEF14E000ACA82D /* mock_render.cpp */,
 				09022C660EA0EA6500CD54EE /* Tools */,
 				4CFA7C090A88742800B03626 /* include */,
 				4C53DEE50A484C220014E966 /* Irrlicht */,
@@ -3360,6 +3368,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A43361551AEF146B00ACA82D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		D2AAC07A0554694100DB518D /* Headers */ = {
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
@@ -3508,6 +3523,7 @@
 				A40361E21AEC526E007DEF1E /* Sources */,
 				A40361E31AEC526E007DEF1E /* Frameworks */,
 				A40361E41AEC526E007DEF1E /* CopyFiles */,
+				A43361551AEF146B00ACA82D /* Headers */,
 			);
 			buildRules = (
 			);
@@ -4006,7 +4022,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				A40361E91AEC526E007DEF1E /* main.cpp in Sources */,
+				A433615C1AEF15D400ACA82D /* GBCarts.c in Sources */,
+				A433615A1AEF14E000ACA82D /* mock_render.cpp in Sources */,
+				A43361561AEF14B100ACA82D /* cpu_tests.cpp in Sources */,
+				A43361571AEF14B100ACA82D /* cart.cpp in Sources */,
+				A43361581AEF14B100ACA82D /* gameboy.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -4631,6 +4651,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
+				DSTROOT = ../../../bin/MacOSX;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -4646,6 +4667,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = ../../../bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4672,6 +4694,7 @@
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DSTROOT = ../../../bin/MacOSX;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
@@ -4681,6 +4704,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INSTALL_PATH = ../../../bin;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -4933,6 +4957,7 @@
 				A40361EC1AEC526E007DEF1E /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		A40361FF1AEC535D007DEF1E /* Build configuration list for PBXNativeTarget "06.2DGraphics copy" */ = {
 			isa = XCConfigurationList;
