@@ -73,7 +73,7 @@ void Render::useTileset(byte id) {
         this->tileBase = TILESET_1_BASE_ADDR;
         this->bgtile = 1;
     } else {
-        this->tileBase = TILESET_O_BASE_ADDR;
+        this->tileBase = TILESET_0_BASE_ADDR;
         this->bgtile = 0;
     }
 }

@@ -6,4 +6,5 @@ Z80/
 EMULib/
 gbemu
 *.o
-
+*.app
+*.xcscheme

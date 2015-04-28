@@ -29,6 +29,11 @@
 			<key>orderHint</key>
 			<integer>5</integer>
 		</dict>
+		<key>06.2DGraphics copy.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>24</integer>
+		</dict>
 		<key>06.2DGraphics.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -114,6 +119,11 @@
 			<key>orderHint</key>
 			<integer>22</integer>
 		</dict>
+		<key>gbtest.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>23</integer>
+		</dict>
 		<key>libIrrlicht.a.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
@@ -158,6 +168,16 @@
 			<true/>
 		</dict>
 		<key>959726FC12C18FFB00BF73D3</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A40361E51AEC526E007DEF1E</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>A40361ED1AEC535D007DEF1E</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -1,4 +1,4 @@
-#define DEBUG
+#define PRINTOPS 0
 
 #include "EMULib/GBCarts.h"
 #include "gameboy.h"
@@ -9,19 +9,19 @@
 
 #define STRICT_ROMCHECK 0
 
-#ifdef DEBUG
+#if PRINTOPS
 #include "opnames.h"
 #define OPNAME(x) OpNameTable[x]
 #define DPRINT(x) printf(x); printf("\n");
 #define DPRINT_ARG(x,i) printf(x,i); printf("\n");
 #else
-#define OPNAME(x)
-#define DPRINT(x)
-#define DPRINT_ARG(x,i)
+#define OPNAME(x) /**/
+#define DPRINT(x) /**/
+#define DPRINT_ARG(x,i) /**/
 #endif
 
-#define INLINE static inline
-
+#define INLINEX static inline
+#define INLINE
 #include "cart.h"
 
 INLINE byte readMem(CPU* cpu, word A)        {
@@ -301,7 +301,7 @@ void ExecCB(CPU* cpu) {
     }
 }
 
-bool execOp(CPU* cpu, Render* gpu, byte I) {
+bool execOp(CPU* cpu, byte I) {
     pair J;
     DPRINT_ARG("instruction: %02X", I);
     DPRINT_ARG("name: %s",OPNAME(I));
@@ -314,7 +314,7 @@ bool execOp(CPU* cpu, Render* gpu, byte I) {
             break;
     }
     
-    gpu->renderStep(cpu->opCycles);
+    cpu->gpu->renderStep(cpu->opCycles);
     
     if(cpu->ICycles <=0) {
         cpu->ICycles += cpu->IPeriod;
@@ -328,7 +328,7 @@ void runGB(CPU* cpu, Render* gpu) {
     for(;gpu->running();) {
         
         I = READ_INC(); //getop
-        if(!execOp(cpu, gpu, I)) {
+        if(!execOp(cpu, I)) {
             return;
         }
     }
@@ -379,7 +379,7 @@ void doBios(CPU* cpu, Render* gpu) {
 
     
     while (cpu->PC.W < 0x100) {
-        execOp(cpu, gpu, READ_INC());
+        execOp(cpu, READ_INC());
     }
 }
 

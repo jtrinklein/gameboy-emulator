@@ -53,9 +53,11 @@ typedef struct {
 
 const int DEFAULT_INTERRUPT_PERIOD = 175782; // from 2.6GHz processor
 const int INITIAL_PC = 0;
-
-bool execOp(CPU* cpu, Render* gpu, byte I);
+byte readMem(CPU* cpu, word A);
+void writeMem(CPU* cpu, word A,byte V);
+bool execOp(CPU* cpu, byte I);
 void runGB(CPU* gb);
+void initCPU(CPU* cpu);
 
 word interruptCheck(CPU* gb);
 void go();

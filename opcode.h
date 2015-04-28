@@ -501,45 +501,45 @@ OP(0xC3) // JP nn
 END
 
 OP(0xE9) // JP (HL)
-    cpu->PC.W = READ(cpu->HL.W);
+    cpu->PC.W = cpu->HL.W;
 END
 
 OP(0xC2) // JP NZ, nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
     if ((cpu->AF.B.l&FLAG_Z) == 0) {
         cpu->ICycles -= 4;
         cpu->opCycles += 4;
-        J.B.h = READ_INC();
-        J.B.l = READ_INC();
         cpu->PC.W = J.W;
     }
 END
 
 OP(0xD2) // JP NC, nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
     if ((cpu->AF.B.l&FLAG_C) == 0) {
         cpu->ICycles -= 4;
         cpu->opCycles += 4;
-        J.B.h = READ_INC();
-        J.B.l = READ_INC();
         cpu->PC.W = J.W;
     }
 END
 
 OP(0xCA) // JP Z, nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
     if (cpu->AF.B.l&FLAG_Z) {
         cpu->ICycles -= 4;
         cpu->opCycles += 4;
-        J.B.h = READ_INC();
-        J.B.l = READ_INC();
         cpu->PC.W = J.W;
     }
 END
 
 OP(0xDA) // JP C, nn
+    J.B.h = READ_INC();
+    J.B.l = READ_INC();
     if (cpu->AF.B.l&FLAG_C) {
         cpu->ICycles -= 4;
         cpu->opCycles += 4;
-        J.B.h = READ_INC();
-        J.B.l = READ_INC();
         cpu->PC.W = J.W;
     }
 END

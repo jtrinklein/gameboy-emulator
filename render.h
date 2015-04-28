@@ -1,9 +1,46 @@
 #ifndef __RENDER_H__
 #define __RENDER_H__
 
-#include "gameboy.h"
+#ifdef BUILD_TEST
+#define U32 unsigned int
+#define COLOR U32
+#define PIMAGE void*
+#define PTEXTURE void*
+#define DEVICE void*
+#define DRIVER void*
+#else
 #include "irrlicht.h"
+#endif
 
+#include "gameboy.h"
+
+#ifndef DRIVER
+#define DRIVER irr::video::IVideoDriver*
+#endif
+
+#ifndef COLOR
+#define COLOR irr::video::SColor
+#endif
+
+#ifndef DEVICE
+#define DEVICE irr::IrrlichtDevice*
+#endif
+
+#ifndef U32
+#define U32 irr::u32
+#endif
+
+#ifndef PU32
+#define PU32 U32*
+#endif
+
+#ifndef PIMAGE
+#define PIMAGE irr::video::IImage*
+#endif
+
+#ifndef PTEXTURE
+#define PTEXTURE irr::video::ITexture*
+#endif
 
 #define TILE_COLUMN_COUNT 20
 #define TILE_ROW_COUNT 18
@@ -18,7 +55,7 @@
 #define COLOR_LIGHT_GREY 1
 #define COLOR_WHITE 0
 
-#define TILESET_O_BASE_ADDR 0x1000
+#define TILESET_0_BASE_ADDR 0x1000
 #define TILESET_1_BASE_ADDR 0x0000
 #define BGMAP_1_BASE_ADDR 0x1C00
 #define BGMAP_0_BASE_ADDR 0x1800
@@ -47,24 +84,24 @@ private:
     
     byte *OAM, *VRAM;
     
-    irr::video::SColor colors[4];
+    COLOR colors[4];
     byte palette[4];
     
-    irr::video::IVideoDriver* driver;
-    irr::IrrlichtDevice* device;
+    DRIVER driver;
+    DEVICE device;
     
-    irr::u32* texture;
-    irr::video::IImage* screenImage;
-    irr::video::ITexture* screenTexture;
+    PU32 texture;
+    PIMAGE screenImage;
+    PTEXTURE screenTexture;
     
     void useTileset(byte id);
     void useBgMap(byte id);
     void renderScanline();
     void drawScreen();
     void updateScreenImage();
-    void updateScreenPixel(irr::u32 pixelX, byte pixelY, irr::video::SColor color);
+    void updateScreenPixel(U32 pixelX, byte pixelY, COLOR color);
     byte readVRAM(word addr);
-    irr::video::SColor getPixelColor(pair tile, byte pixelIdx);
+    COLOR getPixelColor(pair tile, byte pixelIdx);
     
     void updateImageFromTiles();
     void init();
