@@ -7,4 +7,5 @@ EMULib/
 gbemu
 *.o
 *.app
-*.xcscheme
+project.xcworkspace/
+xcuserdata/
