@@ -4,125 +4,27 @@
 <dict>
 	<key>SchemeUserState</key>
 	<dict>
-		<key>01.HelloWorld.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>1</integer>
-		</dict>
-		<key>02.Quake3Map.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>2</integer>
-		</dict>
-		<key>03.CustomSceneNode.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>3</integer>
-		</dict>
-		<key>04.Movement.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>4</integer>
-		</dict>
-		<key>05.UserInterface.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>5</integer>
-		</dict>
-		<key>06.2DGraphics copy.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>24</integer>
-		</dict>
-		<key>06.2DGraphics.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>6</integer>
-		</dict>
-		<key>07.Collision.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>7</integer>
-		</dict>
-		<key>08.SpecialFx.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>8</integer>
-		</dict>
-		<key>09.MeshViewer.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>9</integer>
-		</dict>
-		<key>10.Shaders.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>10</integer>
-		</dict>
-		<key>11.PerPixelLightning.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>11</integer>
-		</dict>
-		<key>12.TerrainRendering.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>12</integer>
-		</dict>
-		<key>13.RenderToTexture.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>13</integer>
-		</dict>
-		<key>15.LoadIrrFile.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>14</integer>
-		</dict>
-		<key>16.Quake3Shader.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>15</integer>
-		</dict>
-		<key>18.SplitScreen.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>16</integer>
-		</dict>
-		<key>19.MouseAndJoystick.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>17</integer>
-		</dict>
-		<key>20.ManagedLights.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>18</integer>
-		</dict>
 		<key>All.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>21</integer>
 		</dict>
-		<key>Demo.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>19</integer>
-		</dict>
-		<key>GUIEditor.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>20</integer>
-		</dict>
 		<key>IrrFramework.xcscheme</key>
 		<dict>
+			<key>isShown</key>
+			<false/>
 			<key>orderHint</key>
 			<integer>22</integer>
 		</dict>
-		<key>gbtest.xcscheme</key>
+		<key>cputests.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>23</integer>
+		</dict>
+		<key>gameboy.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>6</integer>
 		</dict>
 		<key>libIrrlicht.a.xcscheme</key>
 		<dict>

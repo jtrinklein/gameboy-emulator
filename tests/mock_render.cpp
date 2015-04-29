@@ -1,6 +1,3 @@
-#ifndef BUILD_TEST
-#define BUILD_TEST=1
-#endif
 #include "render.h"
 #include "gameboy.h"
 
