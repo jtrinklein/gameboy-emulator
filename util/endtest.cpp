@@ -1,3 +1,6 @@
+/* endtest
+ * a small utility program to determine end-ness of a machine
+ */
 #include <stdio.h>
 
 void main() {
