@@ -4,7 +4,7 @@ EMUTools-113001/
 M6502/
 Z80/
 EMULib/
-gbemu
+build/
 *.o
 *.app
 project.xcworkspace/

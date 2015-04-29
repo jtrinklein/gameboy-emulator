@@ -384,7 +384,8 @@ OP(0x34) // INC (HL)
 END
 
 OP(0x0C) // INC C
-    SET_INC_FLAGS(cpu->BC.B.l++);
+cpu->BC.B.l++;
+    SET_INC_FLAGS(cpu->BC.B.l);
 END
 
 OP(0x1C) // INC E
@@ -425,7 +426,8 @@ OP(0x35) // DEC (HL)
 END
 
 OP(0x0D) // DEC C
-    SET_DEC_FLAGS(cpu->BC.B.l--);
+    cpu->BC.B.l--;
+    SET_DEC_FLAGS(cpu->BC.B.l);
 END
 
 OP(0x1D) // DEC E
