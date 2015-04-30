@@ -1,6 +1,6 @@
 #define PRINTOPS 0
 
-#include "EMULib/GBCarts.h"
+#include "GBCarts.h"
 #include "gameboy.h"
 #include "render.h"
 #include "cycles.h"
@@ -174,7 +174,7 @@ INLINE void writeMem(CPU* cpu, word A,byte V) {
 #define READ_LAST() readMem(cpu, cpu->PC.W-1)
 #define WRITE(a,v) writeMem(cpu, a, v)
 #define SET_INC_FLAGS(v) cpu->AF.B.l=((v==0?FLAG_Z:0)|((v&0xF)==0?FLAG_H:0)|(cpu->AF.B.l&FLAG_C))
-#define SET_DEC_FLAGS(v) cpu->AF.B.l=((v==0?FLAG_Z:0)|((v&0xF)==0xF?0:FLAG_H)|(cpu->AF.B.l&FLAG_C)|FLAG_N)
+#define SET_DEC_FLAGS(v) cpu->AF.B.l=((v==0?FLAG_Z:0)|((v&0xF)==0xF?FLAG_H:0)|(cpu->AF.B.l&FLAG_C)|FLAG_N)
 #define ADD_WORDS(w1,w2) J.W = (w1 + w2) & 0xFFFF;\
                         cpu->AF.B.l = (\
                             (cpu->AF.B.l&FLAG_Z)|\
@@ -324,7 +324,6 @@ bool execOp(CPU* cpu, byte I) {
 }
 void runGB(CPU* cpu, Render* gpu) {
     byte I; // instruction
-    pair J;
     for(;gpu->running();) {
         
         I = READ_INC(); //getop

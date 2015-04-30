@@ -422,7 +422,7 @@ END
 OP(0x35) // DEC (HL)
     J.B.h = READ(cpu->HL.W)-1;
     WRITE(cpu->HL.W, J.B.h);
-    SET_DEC_FLAGS(cpu->HL.B.h);
+    SET_DEC_FLAGS(J.B.h);
 END
 
 OP(0x0D) // DEC C
@@ -441,8 +441,8 @@ OP(0x2D) // DEC L
 END
 
 OP(0x3D) // DEC A
-    cpu->AF.B.l--;
-    SET_DEC_FLAGS(cpu->AF.B.l);
+    cpu->AF.B.h--;
+    SET_DEC_FLAGS(cpu->AF.B.h);
 END
 
 // LD x, n

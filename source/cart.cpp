@@ -1,6 +1,6 @@
 #include "gameboy.h"
 #include "cart.h"
-#include "EMULib/GBCarts.h"
+#include "GBCarts.h"
 #include <fstream>
 
 static const byte NintendoGraphic[] = {

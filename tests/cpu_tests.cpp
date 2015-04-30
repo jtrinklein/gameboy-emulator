@@ -1213,6 +1213,73 @@ void INC_L_ZSET() {
     fset(FLAG_H);
 }
 
+void INC_xHL() {
+    byte ops = 1;
+    
+    cpu->HL.W = 0x1266;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x34);// INC (HL)
+    rom(0x1266, 0x06);// (HL)
+    
+    runOps(ops);
+    
+    eql(read(cpu->HL.W), 0x07);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void INC_xHL_HSET() {
+    byte ops = 1;
+    
+    cpu->HL.W = 0x1266;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x34);// INC (HL)
+    rom(0x1266, 0x0F);// (HL)
+    
+    runOps(ops);
+    
+    eql(read(cpu->HL.W), 0x10);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void INC_xHL_NOHSET() {
+    byte ops = 1;
+    
+    cpu->HL.W = 0x1266;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x34);// INC (HL)
+    rom(0x1266, 0x10);// (HL)
+    
+    runOps(ops);
+    
+    eql(read(cpu->HL.W), 0x11);
+    fnotset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+
+void INC_xHL_ZSET() {
+    byte ops = 1;
+    
+    cpu->HL.W = 0x1266;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x34);// INC (HL)
+    rom(0x1266, 0xFF);// (HL)
+    
+    runOps(ops);
+    
+    eql(read(cpu->HL.W), 0x00);
+    fnotset(FLAG_N);
+    fset(FLAG_Z);
+    fset(FLAG_H);
+}
+
 void INC_A() {
     byte ops = 1;
     cpu->AF.B.h = 0x06;
@@ -1271,88 +1338,624 @@ void INC_A_ZSET() {
     fset(FLAG_Z);
     fset(FLAG_H);
 }
+void DEC_B() {
+    byte ops = 1;
+    cpu->BC.B.h = 0x06;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x05);// DEC B
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.h, 0x05);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_B_HSET() {
+    byte ops = 1;
+    cpu->BC.B.h = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x05);// DEC B
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.h, 0x0F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+void DEC_B_HSET2() {
+    byte ops = 1;
+    cpu->BC.B.h = 0x30;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x05);// DEC B
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.h, 0x2F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void DEC_B_ZSET() {
+    byte ops = 1;
+    cpu->BC.B.h = 0x01;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x05);// DEC B
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.h, 0x00);
+    fset(FLAG_N);
+    fset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_D() {
+    byte ops = 1;
+    cpu->DE.B.h = 0x07;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x15);// DEC D
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.h, 0x06);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_D_HSET() {
+    byte ops = 1;
+    cpu->DE.B.h = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x15);// DEC D
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.h, 0x0F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void DEC_D_ZSET() {
+    byte ops = 1;
+    cpu->DE.B.h = 0x01;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x15);// DEC D
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.h, 0x00);
+    fset(FLAG_N);
+    fset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_H() {
+    byte ops = 1;
+    cpu->HL.B.h = 0x06;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x25);// DEC H
+    
+    runOps(ops);
+    
+    eql(cpu->HL.B.h, 0x05);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_H_HSET() {
+    byte ops = 1;
+    cpu->HL.B.h = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x25);// DEC H
+    
+    runOps(ops);
+    
+    eql(cpu->HL.B.h, 0x0F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void DEC_H_ZSET() {
+    byte ops = 1;
+    cpu->HL.B.h = 0x01;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x25);// DEC H
+    
+    runOps(ops);
+    
+    eql(cpu->HL.B.h, 0x00);
+    fset(FLAG_N);
+    fset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_C() {
+    byte ops = 1;
+    cpu->BC.B.l = 0x08;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x0D);// DEC C
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.l, 0x07);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_C_HSET() {
+    byte ops = 1;
+    cpu->BC.B.l = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x0D);// DEC C
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.l, 0x0F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void DEC_C_ZSET() {
+    byte ops = 1;
+    cpu->BC.B.l = 0x01;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x0D);// DEC C
+    
+    runOps(ops);
+    
+    eql(cpu->BC.B.l, 0x00);
+    fset(FLAG_N);
+    fset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_E() {
+    byte ops = 1;
+    cpu->DE.B.l = 0x08;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x1D);// DEC E
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.l, 0x07);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_E_HSET() {
+    byte ops = 1;
+    cpu->DE.B.l = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x1D);// DEC E
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.l, 0x0F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void DEC_E_ZSET() {
+    byte ops = 1;
+    cpu->DE.B.l = 0x01;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x1D);// DEC E
+    
+    runOps(ops);
+    
+    eql(cpu->DE.B.l, 0x00);
+    fset(FLAG_N);
+    fset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_L() {
+    byte ops = 1;
+    cpu->HL.B.l = 0x08;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x2D);// DEC L
+    
+    runOps(ops);
+    
+    eql(cpu->HL.B.l, 0x07);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_L_HSET() {
+    byte ops = 1;
+    cpu->HL.B.l = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x2D);// DEC L
+    
+    runOps(ops);
+    
+    eql(cpu->HL.B.l, 0x0F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void DEC_L_ZSET() {
+    byte ops = 1;
+    cpu->HL.B.l = 0x01;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x2D);// DEC L
+    
+    runOps(ops);
+    
+    eql(cpu->HL.B.l, 0x00);
+    fset(FLAG_N);
+    fset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+
+void DEC_xHL() {
+    byte ops = 1;
+    
+    cpu->HL.W = 0x1266;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x35);// DEC (HL)
+    rom(0x1266, 0x08);// (HL)
+    
+    runOps(ops);
+    
+    eql(read(cpu->HL.W), 0x07);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_xHL_HSET() {
+    byte ops = 1;
+    
+    cpu->HL.W = 0x1266;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x35);// DEC (HL)
+    rom(0x1266, 0x10);// (HL)
+    
+    runOps(ops);
+    
+    eql(read(cpu->HL.W), 0x0F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void DEC_xHL_ZSET() {
+    byte ops = 1;
+    
+    cpu->HL.W = 0x1266;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x35);// DEC (HL)
+    rom(0x1266, 0x01);// (HL)
+    
+    runOps(ops);
+    
+    eql(read(cpu->HL.W), 0x00);
+    fset(FLAG_N);
+    fset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+
+void DEC_A() {
+    byte ops = 1;
+    cpu->AF.B.h = 0x08;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x3D);// DEC A
+    
+    runOps(ops);
+    
+    eql(cpu->AF.B.h, 0x07);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+void DEC_A_HSET() {
+    byte ops = 1;
+    cpu->AF.B.h = 0x10;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x3D);// DEC A
+    
+    runOps(ops);
+    
+    eql(cpu->AF.B.h, 0x0F);
+    fset(FLAG_N);
+    fnotset(FLAG_Z);
+    fset(FLAG_H);
+}
+
+void DEC_A_ZSET() {
+    byte ops = 1;
+    cpu->AF.B.h = 0x01;
+    cpu->AF.B.l = 0x00;
+    
+    rom(0x100, 0x3D);// DEC A
+    
+    runOps(ops);
+    
+    eql(cpu->AF.B.h, 0x00);
+    fset(FLAG_N);
+    fset(FLAG_Z);
+    fnotset(FLAG_H);
+}
+
+void INC_BC() {
+    byte ops = 1;
+    cpu->BC.W = 0xAB32;
+    
+    rom(0x100, 0x03);
+    
+    runOps(ops);
+    
+    eql(cpu->BC.W, 0xAB33);
+}
+
+void INC_DE() {
+    byte ops = 1;
+    cpu->DE.W = 0xAB32;
+    
+    rom(0x100, 0x13);
+    
+    runOps(ops);
+    
+    eql(cpu->DE.W, 0xAB33);
+}
+
+void INC_HL() {
+    byte ops = 1;
+    cpu->HL.W = 0xAB32;
+    
+    rom(0x100, 0x23);
+    
+    runOps(ops);
+    
+    eql(cpu->HL.W, 0xAB33);
+}
+
+void INC_SP() {
+    byte ops = 1;
+    cpu->SP.W = 0xDFFF;
+    
+    rom(0x100, 0x33);
+    
+    runOps(ops);
+    
+    eql(cpu->SP.W, 0xE000);
+}
+
+void DEC_BC() {
+    byte ops = 1;
+    cpu->BC.W = 0xA001;
+    
+    rom(0x100, 0x0B);
+    
+    runOps(ops);
+    
+    eql(cpu->BC.W, 0xA000);
+}
+
+void DEC_DE() {
+    byte ops = 1;
+    cpu->DE.W = 0xB000;
+    
+    rom(0x100, 0x1B);
+    
+    runOps(ops);
+    
+    eql(cpu->DE.W, 0xAFFF);
+}
+
+void DEC_HL() {
+    byte ops = 1;
+    cpu->HL.W = 0xAB32;
+    
+    rom(0x100, 0x2B);
+    
+    runOps(ops);
+    
+    eql(cpu->HL.W, 0xAB31);
+}
+
+void DEC_SP() {
+    byte ops = 1;
+    cpu->SP.W = 0xDFFF;
+    
+    rom(0x100, 0x3B);
+    
+    runOps(ops);
+    
+    eql(cpu->SP.W, 0xDFFE);
+}
+
+void LD_xBC_A() {
+    byte ops = 1;
+    cpu->AF.B.h = 0xA1;
+    cpu->BC.W = 0x4BC1;
+    
+    rom(0x100, 0x02);//LD (BC), A
+    rom(0x4BC1, 0x00);
+    
+    runOps(ops);
+    
+    eql(read(0x4BC1), 0xA1);
+}
+void LD_xDE_A() {
+    byte ops = 1;
+    cpu->AF.B.h = 0xA1;
+    cpu->DE.W = 0x4BC1;
+    
+    rom(0x100, 0x12);//LD (DE), A
+    rom(0x4BC1, 0x00);
+    
+    runOps(ops);
+    
+    eql(read(0x4BC1), 0xA1);
+}
+void LDI_xHL_A() {
+    byte ops = 1;
+    cpu->AF.B.h = 0xA1;
+    cpu->HL.W = 0x4BC1;
+    
+    rom(0x100, 0x22);//LDI HL, A
+    rom(0x4BC1, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->HL.W, 0x4BC2);
+    eql(read(0x4BC1), 0xA1);
+}
+void LDD_xHL_A() {
+    byte ops = 1;
+    cpu->AF.B.h = 0xA1;
+    cpu->HL.W = 0x4BC1;
+    
+    rom(0x100, 0x32);//LDI HL, A
+    rom(0x4BC1, 0x00);
+    
+    runOps(ops);
+    
+    eql(cpu->HL.W, 0x4BC0);
+    eql(read(0x4BC1), 0xA1);
+}
+
+void LD_A_xBC() {
+    byte ops = 1;
+    cpu->AF.B.h = 0xA1;
+    cpu->BC.W = 0x4BC1;
+    
+    rom(0x100, 0x0A);//LD A, (BC)
+    rom(0x4BC1, 0x3D);
+    
+    runOps(ops);
+    
+    eql(cpu->AF.B.h, 0x3D);
+}
+void LD_A_xDE() {
+    byte ops = 1;
+    cpu->AF.B.h = 0xA1;
+    cpu->DE.W = 0x4BC1;
+    
+    rom(0x100, 0x1A);//LD A, (DE)
+    rom(0x4BC1, 0x3D);
+    
+    runOps(ops);
+    
+    eql(cpu->AF.B.h, 0x3D);
+}
+void LDI_A_xHL() {
+    byte ops = 1;
+    cpu->AF.B.h = 0xA1;
+    cpu->HL.W = 0x4BC1;
+    
+    rom(0x100, 0x2A);//LDI A, (HL)
+    rom(0x4BC1, 0x3D);
+    
+    runOps(ops);
+    
+    eql(cpu->HL.W, 0x4BC2);
+    eql(cpu->AF.B.h, 0x3D);
+}
+void LDD_A_xHL() {
+    byte ops = 1;
+    cpu->AF.B.h = 0xA1;
+    cpu->HL.W = 0x4BC1;
+    
+    rom(0x100, 0x3A);//LDD A, (HL)
+    rom(0x4BC1, 0x3D);
+    
+    runOps(ops);
+    
+    eql(cpu->HL.W, 0x4BC0);
+    eql(cpu->AF.B.h, 0x3D);
+}
+
+void LD_xNN_SP() {
+    byte ops = 1;
+    cpu->SP.W = 0x1234;
+    
+    rom(0x100, 0x08);//LD (nn) SP
+    rom(0x101, 0x01);
+    rom(0x102, 0x20);// 0xAECF
+    rom(0x2001, 0xFF);
+    rom(0x2002, 0xFF);
+    runOps(ops);
+    
+    eql(read(0x2001), 0x12);
+    eql(read(0x2002), 0x34);
+}
 
 void RunAllCpuTests(void) {
     word tests = 0, pass = 0, fail = 0;
     cpu = setup();
-    
-    TEST(PUSH_BC);
-    TEST(PUSH_DE);
-    TEST(PUSH_HL);
-    TEST(PUSH_AF);
-    TEST(POP_BC);
-    TEST(POP_DE);
-    TEST(POP_HL);
-    TEST(POP_AF);
-    TEST(CALL);
-    TEST(CALL_RET);
-    TEST(CALL_Z);
-    TEST(CALL_Z_NOJUMP);
-    TEST(CALL_NZ);
-    TEST(CALL_NZ_NOJUMP);
-    TEST(CALL_C);
-    TEST(CALL_C_NOJUMP);
+
+    TEST(PUSH_BC); TEST(PUSH_DE); TEST(PUSH_HL); TEST(PUSH_AF);
+    TEST(POP_BC); TEST(POP_DE); TEST(POP_HL); TEST(POP_AF);
+    TEST(CALL); TEST(CALL_RET);
+    TEST(CALL_Z); TEST(CALL_Z_NOJUMP);
+    TEST(CALL_NZ); TEST(CALL_NZ_NOJUMP);
+    TEST(CALL_C); TEST(CALL_C_NOJUMP);
     TEST(JP);
-    TEST(JP_Z_NOJUMP);
-    TEST(JP_Z_JUMP);
-    TEST(JP_NZ_NOJUMP);
-    TEST(JP_NZ_JUMP);
-    TEST(JP_C_NOJUMP);
-    TEST(JP_C_JUMP);
-    TEST(JP_NC_NOJUMP);
-    TEST(JP_NC_JUMP);
+    TEST(JP_Z_NOJUMP); TEST(JP_Z_JUMP);
+    TEST(JP_NZ_NOJUMP); TEST(JP_NZ_JUMP);
+    TEST(JP_C_NOJUMP); TEST(JP_C_JUMP);
+    TEST(JP_NC_NOJUMP); TEST(JP_NC_JUMP);
     TEST(JP_HL);
-    TEST(JR);
-    TEST(JR_NEG);
-    TEST(JR_Z);
-    TEST(JR_Z_NOJUMP);
-    TEST(JR_NZ);
-    TEST(JR_NZ_NOJUMP);
-    TEST(JR_C);
-    TEST(JR_C_NOJUMP);
-    TEST(JR_NC);
-    TEST(JR_NC_NOJUMP);
+    TEST(JR); TEST(JR_NEG);
+    TEST(JR_Z); TEST(JR_Z_NOJUMP);
+    TEST(JR_NZ); TEST(JR_NZ_NOJUMP);
+    TEST(JR_C); TEST(JR_C_NOJUMP);
+    TEST(JR_NC); TEST(JR_NC_NOJUMP);
     TEST(RET);
-    TEST(LD_BC);
-    TEST(LD_DE);
-    TEST(LD_HL);
-    TEST(LD_SP);
-    TEST(LD_B);
-    TEST(LD_D);
-    TEST(LD_H);
-    TEST(LD_xHL);
-    TEST(LD_C);
-    TEST(LD_E);
-    TEST(LD_L);
-    TEST(LD_A);
-    TEST(INC_B);
-    TEST(INC_B_HSET);
-    TEST(INC_B_NOHSET);
-    TEST(INC_B_ZSET);
-    TEST(INC_C);
-    TEST(INC_C_HSET);
-    TEST(INC_C_NOHSET);
-    TEST(INC_C_ZSET);
-    TEST(INC_D);
-    TEST(INC_D_HSET);
-    TEST(INC_D_NOHSET);
-    TEST(INC_D_ZSET);
-    TEST(INC_E);
-    TEST(INC_E_HSET);
-    TEST(INC_E_NOHSET);
-    TEST(INC_E_ZSET);
-    TEST(INC_H);
-    TEST(INC_H_HSET);
-    TEST(INC_H_NOHSET);
-    TEST(INC_H_ZSET);
-    TEST(INC_L);
-    TEST(INC_L_HSET);
-    TEST(INC_L_NOHSET);
-    TEST(INC_L_ZSET);
-    TEST(INC_A);
-    TEST(INC_A_HSET);
-    TEST(INC_A_NOHSET);
-    TEST(INC_A_ZSET);
+    TEST(LD_BC); TEST(LD_DE); TEST(LD_HL); TEST(LD_SP);
+    TEST(LD_B); TEST(LD_D); TEST(LD_H); TEST(LD_xHL); TEST(LD_C); TEST(LD_E); TEST(LD_L); TEST(LD_A);
+    TEST(INC_B); TEST(INC_B_HSET); TEST(INC_B_NOHSET); TEST(INC_B_ZSET);
+    TEST(INC_C); TEST(INC_C_HSET); TEST(INC_C_NOHSET); TEST(INC_C_ZSET);
+    TEST(INC_D); TEST(INC_D_HSET); TEST(INC_D_NOHSET); TEST(INC_D_ZSET);
+    TEST(INC_E); TEST(INC_E_HSET); TEST(INC_E_NOHSET); TEST(INC_E_ZSET);
+    TEST(INC_H); TEST(INC_H_HSET); TEST(INC_H_NOHSET); TEST(INC_H_ZSET);
+    TEST(INC_L); TEST(INC_L_HSET); TEST(INC_L_NOHSET); TEST(INC_L_ZSET);
+    TEST(INC_A); TEST(INC_A_HSET); TEST(INC_A_NOHSET); TEST(INC_A_ZSET);
+    TEST(INC_xHL); TEST(INC_xHL_HSET); TEST(INC_xHL_NOHSET); TEST(INC_xHL_ZSET);
+    TEST(DEC_B); TEST(DEC_B_HSET); TEST(DEC_B_HSET2); TEST(DEC_B_ZSET);
+    TEST(DEC_C); TEST(DEC_C_HSET); TEST(DEC_C_ZSET);
+    TEST(DEC_D); TEST(DEC_D_HSET); TEST(DEC_D_ZSET);
+    TEST(DEC_E); TEST(DEC_E_HSET); TEST(DEC_E_ZSET);
+    TEST(DEC_H); TEST(DEC_H_HSET); TEST(DEC_H_ZSET);
+    TEST(DEC_L); TEST(DEC_L_HSET); TEST(DEC_L_ZSET);
+    TEST(DEC_A); TEST(DEC_A_HSET); TEST(DEC_A_ZSET);
+    TEST(DEC_xHL); TEST(DEC_xHL_HSET); TEST(DEC_xHL_ZSET);
+    TEST(INC_BC); TEST(INC_DE); TEST(INC_HL); TEST(INC_SP);
+    TEST(DEC_BC); TEST(DEC_DE); TEST(DEC_HL); TEST(DEC_SP);
+    TEST(LD_xBC_A); TEST(LD_xDE_A); TEST(LDI_xHL_A); TEST(LDD_xHL_A);
+    TEST(LD_A_xBC); TEST(LD_A_xDE); TEST(LDI_A_xHL); TEST(LDD_A_xHL);
+    TEST(LD_xNN_SP);
+    
     cleanup(cpu);
     cout << dec;
     cout << "ran:  " << setw(3) << tests << setw(8) << "(" << setw(4) << assertPass+assertFail << " assertions)" << endl;
@@ -1360,10 +1963,9 @@ void RunAllCpuTests(void) {
     cout << "fail: " << setw(3) << fail <<  setw(8) << "(" << setw(4) << assertFail << " assertions)" << endl;
 }
 
-#ifdef BUILD_TEST
+
 
 int main(void) {
     RunAllCpuTests();
     return 0;
 }
-#endif

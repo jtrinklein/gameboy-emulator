@@ -7,24 +7,19 @@
 		<key>All.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>21</integer>
+			<integer>2</integer>
 		</dict>
 		<key>IrrFramework.xcscheme</key>
 		<dict>
 			<key>isShown</key>
-			<false/>
+			<true/>
 			<key>orderHint</key>
-			<integer>22</integer>
-		</dict>
-		<key>cputests.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>23</integer>
+			<integer>3</integer>
 		</dict>
 		<key>gameboy.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>6</integer>
+			<integer>1</integer>
 		</dict>
 		<key>libIrrlicht.a.xcscheme</key>
 		<dict>
