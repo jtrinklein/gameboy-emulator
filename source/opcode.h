@@ -8,11 +8,18 @@ OP(0x00) // noop
 END
 
 OP(0x76) // HALT
-    cpu->IF |= IF_HALT;
+    cpu->runState = RS_HALT;
 END
 
-OP(0x10)
-    cpu->IF |= IF_STOP;
+OP(0x10) // STOP
+    cpu->runState = RS_STOP;
+END
+
+OP(0x27) // DDA
+    I = cpu->AF.B.h;
+    cpu->AF.B.h += (((cpu->AF.B.h&0x0F)>0x09)||(cpu->AF.B.l&FLAG_H)) ? 0x06 : 0;
+    cpu->AF.B.h += (((cpu->AF.B.h&0xF0)>0x90)||(cpu->AF.B.l&FLAG_C)) ? 0x60 : 0;
+    cpu->AF.B.l = (cpu->AF.B.l&FLAG_N) | (cpu->AF.B.h?0:FLAG_Z)| (I > cpu->AF.B.h?FLAG_C:0);
 END
 
 // LD (xx), A
@@ -1083,7 +1090,7 @@ OP(0x2F) // CPL
 END
 
 OP(0x3F) // CCF
-    cpu->AF.B.l = cpu->AF.B.l|FLAG_Z|((cpu->AF.B.l&FLAG_C)?0:FLAG_C);
+    cpu->AF.B.l = (cpu->AF.B.l&FLAG_Z)|((cpu->AF.B.l&FLAG_C)?0:FLAG_C);
 END
 
 OP(0x37) // SCF

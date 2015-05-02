@@ -32,31 +32,25 @@ INLINE byte readMem(CPU* cpu, word A)        {
                 return cpu->BIOS[addr];
             }
             return cpu->ROM[addr];
-            break;
         case 0x1000:
         case 0x2000:
         case 0x3000:// ROM 0
             return cpu->ROM[addr];
-            break;
         case 0x4000:
         case 0x5000:
         case 0x6000:
         case 0x7000:// ROM 1
             return cpu->ROM[addr];
-            break;
         case 0x8000:
         case 0x9000://VRAM
             return cpu->VRAM[addr & 0x1FFF];
-            break;
         case 0xA000:
         case 0xB000://External RAM
             return cpu->ERAM[addr & 0x1FFF];
-            break;
         case 0xC000:
         case 0xD000://Working RAM
         case 0xE000://Working RAM (shadow)
             return cpu->WRAM[addr & 0x1FFF];
-            break;
         case 0xF000://Working RAM (shadow), IO, Zero-page RAM
             switch(addr&0x0F00) {
                 case 0xF00: // Zero-page RAM
@@ -67,16 +61,12 @@ INLINE byte readMem(CPU* cpu, word A)        {
                         switch (addr & 0x00FF) {
                             case 0x40: // LCD Control
                                 return cpu->gpu->getLCD();
-                                break;
                             case 0x42: //scx
                                 return cpu->gpu->SCX;
-                                break;
                             case 0x43: // scy
                                 return cpu->gpu->SCY;
-                                break;
                             case 0x44: // scanline
                                 return cpu->gpu->scanline;
-                                break;
                         }
                     }
                     // 0xFF00 - 0xFF7F is IO, not handled yet
@@ -87,13 +77,11 @@ INLINE byte readMem(CPU* cpu, word A)        {
                         return cpu->OAM[addr & 0xFF];
                     }
                     return 0;
-                    break;
                 default: // Working RAM (shadow)
                     return cpu->WRAM[addr&0x1FFF];
-                    break;
             }
             break;
-            
+
     }
     return 0;
 }
@@ -165,7 +153,7 @@ INLINE void writeMem(CPU* cpu, word A,byte V) {
                     break;
             }
             break;
-            
+
     }
 }
 
@@ -313,12 +301,6 @@ bool execOp(CPU* cpu, byte I) {
             printf("[GameBoy] Unrecognized instruction: %02X at PC=%04X\n", READ(cpu->PC.W-1), cpu->PC.W-1);
             break;
     }
-    
-    cpu->gpu->renderStep(cpu->opCycles);
-    
-    if(cpu->ICycles <=0) {
-        cpu->ICycles += cpu->IPeriod;
-    }
 
     return true;
 }
@@ -326,14 +308,31 @@ void runGB(CPU* cpu, Render* gpu) {
     byte I; // instruction
     for(;gpu->running();) {
         
-        I = READ_INC(); //getop
+        if(cpu->runState == RS_RUN) {
+            I = READ_INC(); //getop
+        } else {
+            // if stopped or halted, run NOP
+            I = 0x00;
+        }
+        
         if(!execOp(cpu, I)) {
             return;
         }
+        
+        cpu->gpu->renderStep(cpu->opCycles);
+        
+        if(cpu->ICycles <=0) {
+            cpu->ICycles += cpu->IPeriod;
+            if (cpu->IF & IF_IE) {
+                
+            }
+        }
+        
     }
 }
 
 void initCPU(CPU* cpu) {
+    cpu->inBios = 0x00;
     cpu->PC.W = 0x100;
     cpu->AF.B.h = 0x01;
     cpu->AF.B.l = 0xB0;
@@ -376,18 +375,19 @@ void initCPU(CPU* cpu) {
 
 void doBios(CPU* cpu, Render* gpu) {
 
-    
+
     while (cpu->PC.W < 0x100) {
         execOp(cpu, READ_INC());
     }
+    cpu->inBios = 0x01;
 }
 
 void go() {
     const char *file = "/Users/jtrinklein/gameboy/emulator/roms/cpu_instrs/cpu_instrs.gb";
 //    const char *file = "/Users/jtrinklein/gameboy/emulator/roms/instr_timing/instr_timing.gb";
     DPRINT_ARG("loading rom: %s", file);
-    
-    
+
+
     CPU* cpu = new CPU();
     cpu->OAM  = new byte[0x0100];
     cpu->ZRAM = new byte[0x0100];
@@ -395,7 +395,7 @@ void go() {
     cpu->ERAM = new byte[0x2000];
     cpu->VRAM = new byte[0x2000];
     cpu->ROM = loadRom(file);
-    
+
     cpu->gpu = new Render(cpu->VRAM, cpu->OAM);
     initCPU(cpu);
     DPRINT("check graphic");

@@ -23,8 +23,9 @@ extern "C" {
 #define FLAG_H      0x20       /* 1: Halfcarry               */
 #define FLAG_C      0x10       /* 1: Carry/Borrow occured    */
 
-#define IF_HALT     0x01       /* 1: halt enabled            */
-#define IF_STOP     0x02       /* 1: stop enabled            */
+#define RS_RUN      0x00
+#define RS_HALT     0x01       /* 1: halt enabled            */
+#define RS_STOP     0x02       /* 1: stop enabled            */
 #define IF_IE       0x04       /* 1: interrupts enabled      */
 
 
@@ -40,15 +41,16 @@ class Render;
 typedef struct {
     byte *ROM, *ZRAM, *WRAM, *ERAM, *VRAM, *OAM, *BIOS;
     Render *gpu;
-    bool inBios;
-    
+
     pair AF, BC, DE, HL, SP, PC;
     byte opCycles;
-    
+
     int IPeriod,ICycles;
     word IRequest;      // set to adress of pending IRQ
     byte IAutoReset;    // set to 1 to automatically reset IRequest
     byte IF; // Interrupt flag register
+    byte runState; // halt, stop, etc...
+    byte inBios;
 } CPU;
 
 const int DEFAULT_INTERRUPT_PERIOD = 175782; // from 2.6GHz processor

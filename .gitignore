@@ -5,6 +5,7 @@ M6502/
 Z80/
 EMULib/
 build/
+bin/
 *.o
 *.app
 project.xcworkspace/
