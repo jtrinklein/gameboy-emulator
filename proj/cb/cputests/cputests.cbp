@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="cputests" />
+		<Option pch_mode="2" />
+		<Option compiler="clang" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../../bin/cputests_dbg" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../../bin" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="clang" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-Wall" />
+					<Add option="-std=c++11" />
+					<Add option="-g" />
+					<Add option="-DDEBUG=1" />
+					<Add option="-DBUILD_TEST=1" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../../../bin/cputests" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="../../../bin" />
+				<Option object_output="obj/Release/" />
+				<Option type="1" />
+				<Option compiler="clang" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-O2" />
+					<Add option="-DBUILD_TEST=1" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Weverything" />
+			<Add option="-fexceptions" />
+			<Add directory="../../../source" />
+		</Compiler>
+		<Unit filename="../../../source/GBCarts.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../source/GBCarts.h" />
+		<Unit filename="../../../source/bios.h" />
+		<Unit filename="../../../source/cart.cpp" />
+		<Unit filename="../../../source/cart.h" />
+		<Unit filename="../../../source/cycles.h" />
+		<Unit filename="../../../source/gameboy.cpp" />
+		<Unit filename="../../../source/gameboy.h" />
+		<Unit filename="../../../source/opcode.h" />
+		<Unit filename="../../../source/opcodeCB.h" />
+		<Unit filename="../../../source/opnames.h" />
+		<Unit filename="../../../source/render.h" />
+		<Unit filename="../../../tests/cpu_tests.cpp" />
+		<Unit filename="../../../tests/mock_render.cpp" />
+		<Unit filename="../../../tests/tests.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger>
+				<search_path add="/opt/boxen/homebrew/bin" />
+			</debugger>
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
