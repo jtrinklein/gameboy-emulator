@@ -1,0 +1,489 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A4A153A21AF477C600DA5F0E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4A153A11AF477C600DA5F0E /* Images.xcassets */; };
+		A4A153A51AF477C600DA5F0E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A4A153A31AF477C600DA5F0E /* MainMenu.xib */; };
+		A4A153B11AF477C600DA5F0E /* gameboyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A4A153B01AF477C600DA5F0E /* gameboyTests.m */; };
+		A4A153C81AF4792F00DA5F0E /* gameboy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BA1AF4792F00DA5F0E /* gameboy.cpp */; };
+		A4A153C91AF4792F00DA5F0E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BB1AF4792F00DA5F0E /* main.cpp */; };
+		A4A153CA1AF4792F00DA5F0E /* cart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BE1AF4792F00DA5F0E /* cart.cpp */; };
+		A4A153CB1AF4792F00DA5F0E /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BF1AF4792F00DA5F0E /* render.cpp */; };
+		A4A153CC1AF4792F00DA5F0E /* GBCarts.c in Sources */ = {isa = PBXBuildFile; fileRef = A4A153C61AF4792F00DA5F0E /* GBCarts.c */; };
+		A4E6CAAC1AF6CCD8001429CD /* mmu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4E6CAAA1AF6CCD8001429CD /* mmu.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A4A153AB1AF477C600DA5F0E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A4A1538F1AF477C600DA5F0E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = A4A153961AF477C600DA5F0E;
+			remoteInfo = gameboy;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		A4A153971AF477C600DA5F0E /* gameboy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gameboy.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4A1539B1AF477C600DA5F0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A4A153A11AF477C600DA5F0E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		A4A153A41AF477C600DA5F0E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		A4A153AA1AF477C600DA5F0E /* gameboyTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = gameboyTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4A153AF1AF477C600DA5F0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A4A153B01AF477C600DA5F0E /* gameboyTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = gameboyTests.m; sourceTree = "<group>"; };
+		A4A153BA1AF4792F00DA5F0E /* gameboy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gameboy.cpp; path = ../../../source/gameboy.cpp; sourceTree = "<group>"; };
+		A4A153BB1AF4792F00DA5F0E /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../../source/main.cpp; sourceTree = "<group>"; };
+		A4A153BC1AF4792F00DA5F0E /* opcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = opcode.h; path = ../../../source/opcode.h; sourceTree = "<group>"; };
+		A4A153BD1AF4792F00DA5F0E /* gameboy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gameboy.h; path = ../../../source/gameboy.h; sourceTree = "<group>"; };
+		A4A153BE1AF4792F00DA5F0E /* cart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cart.cpp; path = ../../../source/cart.cpp; sourceTree = "<group>"; };
+		A4A153BF1AF4792F00DA5F0E /* render.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = render.cpp; path = ../../../source/render.cpp; sourceTree = "<group>"; };
+		A4A153C01AF4792F00DA5F0E /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = render.h; path = ../../../source/render.h; sourceTree = "<group>"; };
+		A4A153C11AF4792F00DA5F0E /* bios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bios.h; path = ../../../source/bios.h; sourceTree = "<group>"; };
+		A4A153C21AF4792F00DA5F0E /* opcodeCB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = opcodeCB.h; path = ../../../source/opcodeCB.h; sourceTree = "<group>"; };
+		A4A153C31AF4792F00DA5F0E /* cart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cart.h; path = ../../../source/cart.h; sourceTree = "<group>"; };
+		A4A153C41AF4792F00DA5F0E /* opnames.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = opnames.h; path = ../../../source/opnames.h; sourceTree = "<group>"; };
+		A4A153C51AF4792F00DA5F0E /* GBCarts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GBCarts.h; path = ../../../source/GBCarts.h; sourceTree = "<group>"; };
+		A4A153C61AF4792F00DA5F0E /* GBCarts.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GBCarts.c; path = ../../../source/GBCarts.c; sourceTree = "<group>"; };
+		A4A153C71AF4792F00DA5F0E /* cycles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cycles.h; path = ../../../source/cycles.h; sourceTree = "<group>"; };
+		A4E6CAAA1AF6CCD8001429CD /* mmu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mmu.cpp; path = ../../../source/mmu.cpp; sourceTree = "<group>"; };
+		A4E6CAAB1AF6CCD8001429CD /* mmu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mmu.h; path = ../../../source/mmu.h; sourceTree = "<group>"; };
+		A4E6CAAD1AF6CD2C001429CD /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = ../../../source/types.h; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		A4A153941AF477C600DA5F0E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4A153A71AF477C600DA5F0E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		A4A1538E1AF477C600DA5F0E = {
+			isa = PBXGroup;
+			children = (
+				A4A153991AF477C600DA5F0E /* gameboy */,
+				A4A153AD1AF477C600DA5F0E /* gameboyTests */,
+				A4A153981AF477C600DA5F0E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A4A153981AF477C600DA5F0E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A4A153971AF477C600DA5F0E /* gameboy.app */,
+				A4A153AA1AF477C600DA5F0E /* gameboyTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A4A153991AF477C600DA5F0E /* gameboy */ = {
+			isa = PBXGroup;
+			children = (
+				A4E6CAAD1AF6CD2C001429CD /* types.h */,
+				A4E6CAAA1AF6CCD8001429CD /* mmu.cpp */,
+				A4E6CAAB1AF6CCD8001429CD /* mmu.h */,
+				A4A153BA1AF4792F00DA5F0E /* gameboy.cpp */,
+				A4A153BB1AF4792F00DA5F0E /* main.cpp */,
+				A4A153BC1AF4792F00DA5F0E /* opcode.h */,
+				A4A153BD1AF4792F00DA5F0E /* gameboy.h */,
+				A4A153BE1AF4792F00DA5F0E /* cart.cpp */,
+				A4A153BF1AF4792F00DA5F0E /* render.cpp */,
+				A4A153C01AF4792F00DA5F0E /* render.h */,
+				A4A153C11AF4792F00DA5F0E /* bios.h */,
+				A4A153C21AF4792F00DA5F0E /* opcodeCB.h */,
+				A4A153C31AF4792F00DA5F0E /* cart.h */,
+				A4A153C41AF4792F00DA5F0E /* opnames.h */,
+				A4A153C51AF4792F00DA5F0E /* GBCarts.h */,
+				A4A153C61AF4792F00DA5F0E /* GBCarts.c */,
+				A4A153C71AF4792F00DA5F0E /* cycles.h */,
+				A4A153A11AF477C600DA5F0E /* Images.xcassets */,
+				A4A153A31AF477C600DA5F0E /* MainMenu.xib */,
+				A4A1539A1AF477C600DA5F0E /* Supporting Files */,
+			);
+			path = gameboy;
+			sourceTree = "<group>";
+		};
+		A4A1539A1AF477C600DA5F0E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				A4A1539B1AF477C600DA5F0E /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		A4A153AD1AF477C600DA5F0E /* gameboyTests */ = {
+			isa = PBXGroup;
+			children = (
+				A4A153B01AF477C600DA5F0E /* gameboyTests.m */,
+				A4A153AE1AF477C600DA5F0E /* Supporting Files */,
+			);
+			path = gameboyTests;
+			sourceTree = "<group>";
+		};
+		A4A153AE1AF477C600DA5F0E /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				A4A153AF1AF477C600DA5F0E /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		A4A153961AF477C600DA5F0E /* gameboy */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A4A153B41AF477C600DA5F0E /* Build configuration list for PBXNativeTarget "gameboy" */;
+			buildPhases = (
+				A4A153931AF477C600DA5F0E /* Sources */,
+				A4A153941AF477C600DA5F0E /* Frameworks */,
+				A4A153951AF477C600DA5F0E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = gameboy;
+			productName = gameboy;
+			productReference = A4A153971AF477C600DA5F0E /* gameboy.app */;
+			productType = "com.apple.product-type.application";
+		};
+		A4A153A91AF477C600DA5F0E /* gameboyTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A4A153B71AF477C600DA5F0E /* Build configuration list for PBXNativeTarget "gameboyTests" */;
+			buildPhases = (
+				A4A153A61AF477C600DA5F0E /* Sources */,
+				A4A153A71AF477C600DA5F0E /* Frameworks */,
+				A4A153A81AF477C600DA5F0E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A4A153AC1AF477C600DA5F0E /* PBXTargetDependency */,
+			);
+			name = gameboyTests;
+			productName = gameboyTests;
+			productReference = A4A153AA1AF477C600DA5F0E /* gameboyTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A4A1538F1AF477C600DA5F0E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0620;
+				ORGANIZATIONNAME = "Magicode Software";
+				TargetAttributes = {
+					A4A153961AF477C600DA5F0E = {
+						CreatedOnToolsVersion = 6.2;
+					};
+					A4A153A91AF477C600DA5F0E = {
+						CreatedOnToolsVersion = 6.2;
+						TestTargetID = A4A153961AF477C600DA5F0E;
+					};
+				};
+			};
+			buildConfigurationList = A4A153921AF477C600DA5F0E /* Build configuration list for PBXProject "gameboy" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A4A1538E1AF477C600DA5F0E;
+			productRefGroup = A4A153981AF477C600DA5F0E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A4A153961AF477C600DA5F0E /* gameboy */,
+				A4A153A91AF477C600DA5F0E /* gameboyTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		A4A153951AF477C600DA5F0E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4A153A21AF477C600DA5F0E /* Images.xcassets in Resources */,
+				A4A153A51AF477C600DA5F0E /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4A153A81AF477C600DA5F0E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		A4A153931AF477C600DA5F0E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4A153C81AF4792F00DA5F0E /* gameboy.cpp in Sources */,
+				A4A153C91AF4792F00DA5F0E /* main.cpp in Sources */,
+				A4A153CB1AF4792F00DA5F0E /* render.cpp in Sources */,
+				A4E6CAAC1AF6CCD8001429CD /* mmu.cpp in Sources */,
+				A4A153CA1AF4792F00DA5F0E /* cart.cpp in Sources */,
+				A4A153CC1AF4792F00DA5F0E /* GBCarts.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A4A153A61AF477C600DA5F0E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A4A153B11AF477C600DA5F0E /* gameboyTests.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A4A153AC1AF477C600DA5F0E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = A4A153961AF477C600DA5F0E /* gameboy */;
+			targetProxy = A4A153AB1AF477C600DA5F0E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		A4A153A31AF477C600DA5F0E /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				A4A153A41AF477C600DA5F0E /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		A4A153B21AF477C600DA5F0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+			};
+			name = Debug;
+		};
+		A4A153B31AF477C600DA5F0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		A4A153B51AF477C600DA5F0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"../../irrlicht-1.8.1/include/",
+				);
+				INFOPLIST_FILE = gameboy/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = "../../irrlicht-1.8.1/lib/";
+				OTHER_LDFLAGS = (
+					"-framework",
+					OpenGL,
+					"-framework",
+					AppKit,
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					Foundation,
+					"-lIrrlicht",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		A4A153B61AF477C600DA5F0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				COMBINE_HIDPI_IMAGES = YES;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
+					"../../irrlicht-1.8.1/include/",
+				);
+				INFOPLIST_FILE = gameboy/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
+				LIBRARY_SEARCH_PATHS = "../../irrlicht-1.8.1/lib/";
+				OTHER_LDFLAGS = (
+					"-framework",
+					OpenGL,
+					"-framework",
+					AppKit,
+					"-framework",
+					IOKit,
+					"-framework",
+					Carbon,
+					"-framework",
+					Foundation,
+					"-lIrrlicht",
+				);
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		A4A153B81AF477C600DA5F0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = gameboyTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/gameboy.app/Contents/MacOS/gameboy";
+			};
+			name = Debug;
+		};
+		A4A153B91AF477C600DA5F0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				COMBINE_HIDPI_IMAGES = YES;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(DEVELOPER_FRAMEWORKS_DIR)",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = gameboyTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/gameboy.app/Contents/MacOS/gameboy";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		A4A153921AF477C600DA5F0E /* Build configuration list for PBXProject "gameboy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4A153B21AF477C600DA5F0E /* Debug */,
+				A4A153B31AF477C600DA5F0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A4A153B41AF477C600DA5F0E /* Build configuration list for PBXNativeTarget "gameboy" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4A153B51AF477C600DA5F0E /* Debug */,
+				A4A153B61AF477C600DA5F0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A4A153B71AF477C600DA5F0E /* Build configuration list for PBXNativeTarget "gameboyTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A4A153B81AF477C600DA5F0E /* Debug */,
+				A4A153B91AF477C600DA5F0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = A4A1538F1AF477C600DA5F0E /* Project object */;
+}

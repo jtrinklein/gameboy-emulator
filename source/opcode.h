@@ -322,14 +322,14 @@ OP(0x3A) // LD A, (HL-)
 END
 
 OP(0xFA) // LD A, (nn)
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     cpu->AF.B.h = READ(J.W);
 END
 
 OP(0xEA) // LD (nn), A
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     WRITE(J.W, cpu->AF.B.h);
 END
 
@@ -504,8 +504,8 @@ END
 
 // JP
 OP(0xC3) // JP nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     cpu->PC.W = J.W;
 END
 
@@ -514,8 +514,8 @@ OP(0xE9) // JP (HL)
 END
 
 OP(0xC2) // JP NZ, nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     if ((cpu->AF.B.l&FLAG_Z) == 0) {
         cpu->ICycles -= 4;
         cpu->opCycles += 4;
@@ -524,8 +524,8 @@ OP(0xC2) // JP NZ, nn
 END
 
 OP(0xD2) // JP NC, nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     if ((cpu->AF.B.l&FLAG_C) == 0) {
         cpu->ICycles -= 4;
         cpu->opCycles += 4;
@@ -534,8 +534,8 @@ OP(0xD2) // JP NC, nn
 END
 
 OP(0xCA) // JP Z, nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     if (cpu->AF.B.l&FLAG_Z) {
         cpu->ICycles -= 4;
         cpu->opCycles += 4;
@@ -544,8 +544,8 @@ OP(0xCA) // JP Z, nn
 END
 
 OP(0xDA) // JP C, nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     if (cpu->AF.B.l&FLAG_C) {
         cpu->ICycles -= 4;
         cpu->opCycles += 4;
@@ -594,8 +594,8 @@ OP(0x38) // JR C, n
 END
 
 OP(0x08) // LD (nn), SP
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     WRITE(J.W, cpu->SP.B.l);
     WRITE(J.W+1, cpu->SP.B.h);
 END
@@ -1010,7 +1010,7 @@ END
 
 OP(0xD9) // RETI
     RET();
-    cpu->IF |= IF_IE;
+    cpu->IME = IE_ENABLED;
 END
 
 OP(0xC8) // RET Z
@@ -1047,23 +1047,23 @@ END
 
 // LD xx, nn
 OP(0x01) // LD BC, nn
-    cpu->BC.B.h = READ_INC();
     cpu->BC.B.l = READ_INC();
+    cpu->BC.B.h = READ_INC();
 END
 
 OP(0x11) // LD DE, nn
-    cpu->DE.B.h = READ_INC();
     cpu->DE.B.l = READ_INC();
+    cpu->DE.B.h = READ_INC();
 END
 
 OP(0x21) // LD HL, nn
-    cpu->HL.B.h = READ_INC();
     cpu->HL.B.l = READ_INC();
+    cpu->HL.B.h = READ_INC();
 END
 
 OP(0x31) // LD SP, nn
-    cpu->SP.B.h = READ_INC();
     cpu->SP.B.l = READ_INC();
+    cpu->SP.B.h = READ_INC();
 END
 
 OP(0xE2) // LD (C), A
@@ -1085,8 +1085,8 @@ END
 
 
 OP(0x2F) // CPL
-    cpu->AF.B.l = ~(cpu->AF.B.h);
-    cpu->AF.B.h = cpu->AF.B.l|FLAG_N|FLAG_H;
+    cpu->AF.B.h = ~(cpu->AF.B.h);
+    cpu->AF.B.l |= FLAG_N|FLAG_H;
 END
 
 OP(0x3F) // CCF
@@ -1107,15 +1107,15 @@ END
 
 // CALL
 OP(0xCD) // CALL nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     PUSH(cpu->PC);
     cpu->PC.W = J.W;
 END
 
 OP(0xC4) // CALL NZ, nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     if ((cpu->AF.B.l&FLAG_Z) == 0) {
         cpu->ICycles -= 12;
         cpu->opCycles += 12;
@@ -1125,8 +1125,8 @@ OP(0xC4) // CALL NZ, nn
 END
 
 OP(0xCC) // CALL Z, nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     if (cpu->AF.B.l&FLAG_Z) {
         cpu->ICycles -= 12;
         cpu->opCycles += 12;
@@ -1136,8 +1136,8 @@ OP(0xCC) // CALL Z, nn
 END
 
 OP(0xD4) // CALL NC, nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     if ((cpu->AF.B.l&FLAG_C) == 0) {
         cpu->ICycles -= 12;
         cpu->opCycles += 12;
@@ -1147,8 +1147,8 @@ OP(0xD4) // CALL NC, nn
 END
 
 OP(0xDC) // CALL C, nn
-    J.B.h = READ_INC();
     J.B.l = READ_INC();
+    J.B.h = READ_INC();
     if (cpu->AF.B.l&FLAG_C) {
         cpu->ICycles -= 12;
         cpu->opCycles += 12;
@@ -1159,11 +1159,11 @@ END
 
 // Interrupt Enable/disable
 OP(0xF3) // ID
-    cpu->IF &= (~IF_IE);
+    cpu->IME = 0;
 END
 
 OP(0xFB) // IE
-    cpu->IF |= IF_IE;
+    cpu->IME = IE_ENABLED;
 END
 
 // Illegals

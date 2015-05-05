@@ -12,6 +12,7 @@
 		A4992AA51AF27D85003C98BB /* GBCarts.c in Sources */ = {isa = PBXBuildFile; fileRef = A4992AA11AF27D85003C98BB /* GBCarts.c */; };
 		A4992AA91AF27DC3003C98BB /* cpu_tests.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4992AA61AF27DC3003C98BB /* cpu_tests.cpp */; };
 		A4992AAA1AF27DC3003C98BB /* mock_render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4992AA71AF27DC3003C98BB /* mock_render.cpp */; };
+		A4E6CAB01AF83F60001429CD /* mmu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4E6CAAE1AF83F60001429CD /* mmu.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +44,8 @@
 		A4992AA71AF27DC3003C98BB /* mock_render.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mock_render.cpp; path = ../../tests/mock_render.cpp; sourceTree = "<group>"; };
 		A4992AA81AF27DC3003C98BB /* tests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tests.h; path = ../../tests/tests.h; sourceTree = "<group>"; };
 		A4C4400C1AF1C1FA00A028A2 /* cputests */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cputests; sourceTree = BUILT_PRODUCTS_DIR; };
+		A4E6CAAE1AF83F60001429CD /* mmu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mmu.cpp; path = ../../source/mmu.cpp; sourceTree = "<group>"; };
+		A4E6CAAF1AF83F60001429CD /* mmu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mmu.h; path = ../../source/mmu.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -59,6 +62,8 @@
 		A4C440031AF1C1FA00A028A2 = {
 			isa = PBXGroup;
 			children = (
+				A4E6CAAE1AF83F60001429CD /* mmu.cpp */,
+				A4E6CAAF1AF83F60001429CD /* mmu.h */,
 				A4992AA61AF27DC3003C98BB /* cpu_tests.cpp */,
 				A4992AA71AF27DC3003C98BB /* mock_render.cpp */,
 				A4992AA81AF27DC3003C98BB /* tests.h */,
@@ -145,6 +150,7 @@
 				A4992AAA1AF27DC3003C98BB /* mock_render.cpp in Sources */,
 				A4992AA91AF27DC3003C98BB /* cpu_tests.cpp in Sources */,
 				A4992AA51AF27D85003C98BB /* GBCarts.c in Sources */,
+				A4E6CAB01AF83F60001429CD /* mmu.cpp in Sources */,
 				A4992AA31AF27D85003C98BB /* gameboy.cpp in Sources */,
 				A4992AA41AF27D85003C98BB /* cart.cpp in Sources */,
 			);

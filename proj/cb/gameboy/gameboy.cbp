@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="gameboy" />
+		<Option pch_mode="2" />
+		<Option compiler="clang" />
+		<Build>
+			<Target title="Debug">
+				<Option output="../../../bin/gameboy_dbg" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="/Users/jtrinklein/src/gameboy/bin/" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="clang" />
+				<Compiler>
+					<Add option="-g" />
+				</Compiler>
+			</Target>
+			<Target title="Release">
+				<Option output="../../../bin/gameboy" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="/Users/jtrinklein/src/gameboy/bin/" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="clang" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="/Users/jtrinklein/src/gameboy/emulator/irrlicht-1.8.1/include" />
+		</Compiler>
+		<Linker>
+			<Add option="-framework OpenGL" />
+			<Add option="-framework IOKit" />
+			<Add option="-framework Carbon" />
+			<Add option="-framework Foundation" />
+			<Add option="-framework AppKit" />
+			<Add library="Irrlicht" />
+			<Add directory="/Users/jtrinklein/src/gameboy/emulator/irrlicht-1.8.1/lib/" />
+		</Linker>
+		<Unit filename="../../../source/GBCarts.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="../../../source/GBCarts.h" />
+		<Unit filename="../../../source/bios.h" />
+		<Unit filename="../../../source/cart.cpp" />
+		<Unit filename="../../../source/cart.h" />
+		<Unit filename="../../../source/cycles.h" />
+		<Unit filename="../../../source/gameboy.cpp" />
+		<Unit filename="../../../source/gameboy.h" />
+		<Unit filename="../../../source/main.cpp" />
+		<Unit filename="../../../source/opcode.h" />
+		<Unit filename="../../../source/opcodeCB.h" />
+		<Unit filename="../../../source/opnames.h" />
+		<Unit filename="../../../source/render.cpp" />
+		<Unit filename="../../../source/render.h" />
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>

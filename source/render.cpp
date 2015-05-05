@@ -1,11 +1,12 @@
 #include "irrlicht.h"
 #include "render.h"
+#include "mmu.h"
 
 using namespace irr;
 
-Render::Render(byte* vram, byte* oam) {
-    this->OAM = oam;
-    this->VRAM = vram;
+Render::Render(MMU* mmu) {
+    this->OAM = mmu->oam;
+    this->VRAM = mmu->vram;
     this->bgtile = 0;
     this->init();
     this->scanline = 0;
@@ -59,8 +60,8 @@ pair Render::getTileRow(byte idx, byte rowIdx) {
     word addr = this->tileBase + (this->bgtile ? idx : (signedbyte)idx)*16 + rowIdx*2;
 
     pair p;
-    p.B.h = this->readVRAM(addr);
-    p.B.l = this->readVRAM(addr + 1);
+    p.B.l = this->readVRAM(addr);
+    p.B.h = this->readVRAM(addr + 1);
     return p;
 }
 
@@ -113,14 +114,14 @@ void Render::renderScanline() {
     word mapoffset = this->mapBase;
         
     // Which line of tiles to use in the map
-    byte rowoffset = ((this->scanline + this->SCY) & 0xFF) >> 3;// y / 8 = y >> 3
+    byte rowoffset = ((this->scanline /*+ this->SCY*/) & 0xFF) >> 3;// y / 8 = y >> 3
     mapoffset += rowoffset << 5; // r*32 = r << 5
         
     // Which tile to start with in the map line
     byte lineoffset = (this->SCX >> 3); // x / 8 = x >> 3
     
     // Which line of pixels to use in the tiles
-    byte pixelRowIdx = (this->scanline + this->SCY) & 0x07;
+    byte pixelRowIdx = (this->scanline /*+ this->SCY*/) & 0x07;
         
     // Where in the tileline to start
     byte x = this->SCX & 0x07;

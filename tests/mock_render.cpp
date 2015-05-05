@@ -2,7 +2,7 @@
 #include "gameboy.h"
 
 
-Render::Render(byte*,byte*) {
+Render::Render(MMU*) {
     this->SCX = this->SCY = this->scanline = 0;
     this->LCD = 0x81;
 }

@@ -12,7 +12,7 @@
 #include "irrlicht.h"
 #endif
 
-#include "gameboy.h"
+#include "types.h"
 
 #ifndef DRIVER
 #define DRIVER irr::video::IVideoDriver*
@@ -68,7 +68,7 @@
 
 class Render {
 public:
-    Render(byte* VRAM, byte* OAM);
+    Render(MMU* mmu);
     ~Render();
     bool running();
     void renderStep(byte cycleDelta);

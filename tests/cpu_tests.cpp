@@ -4,6 +4,8 @@
 #include "tests.h"
 #include "gameboy.h"
 #include "render.h"
+#include "mmu.h"
+#include "cart.h"
 
 using namespace std;
 unsigned assertFail = 0;
@@ -55,32 +57,24 @@ unsigned long getTitleLength(string title) {
     return title.length();
 }
 
-CPU* setup() {
+CPU* testsetup() {
     CPU* c = new CPU();
-    c->OAM  = new byte[0x0100];
-    c->ZRAM = new byte[0x0100];
-    c->WRAM = new byte[0x2000];
-    c->ERAM = new byte[0x2000];
-    c->VRAM = new byte[0x2000];
-    c->ROM  = new byte[0x8000];
-    c->gpu = new Render(c->VRAM, c->OAM);
+    c->mmu = new MMU();
+    c->mmu->rom = new byte[0x8000];
+    c->mmu->cart = new Cart("TEST");
+    c->gpu = new Render(c->mmu);
     return c;
 }
 
-void cleanup(CPU* cpu) {
+void testcleanup(CPU* cpu) {
     delete cpu->gpu;
-    delete [] cpu->ROM;
-    delete [] cpu->OAM;
-    delete [] cpu->WRAM;
-    delete [] cpu->ZRAM;
-    delete [] cpu->ERAM;
-    delete [] cpu->VRAM;
+    delete cpu->mmu;
     delete cpu;
 }
 
 void beforeTest() {
     //clear rom
-    memset(cpu->ROM, 0, 0x8000);
+    memset(cpu->mmu->rom, 0, 0x8000);
 
     //reset cpu
     initCPU(cpu);
@@ -94,7 +88,8 @@ byte read(word a) {
     return readMem(cpu, a);
 }
 void rom(word a, byte v) {
-    writeMem(cpu, a, v);
+    //writeMem(cpu, a, v);
+    cpu->mmu->rom[a] = v;
     //cpu->ROM[a] = v;
 }
 
@@ -2684,7 +2679,7 @@ void LD_L_A() {   cpu->AF.B.h = 0x12; rom(0x100, 0x6F);                    runOp
 
 void RunAllCpuTests(void) {
     word tests = 0, pass = 0, fail = 0;
-    cpu = setup();
+    cpu = testsetup();
 
     TEST(PUSH_BC); TEST(PUSH_DE); TEST(PUSH_HL); TEST(PUSH_AF);
     TEST(POP_BC); TEST(POP_DE); TEST(POP_HL); TEST(POP_AF);
@@ -2744,7 +2739,7 @@ void RunAllCpuTests(void) {
     TEST(LD_xHL_B); TEST(LD_xHL_D); TEST(LD_xHL_H); TEST(LD_xHL_C); TEST(LD_xHL_E); TEST(LD_xHL_L); TEST(LD_xHL_A);
 
     
-    cleanup(cpu);
+    testcleanup(cpu);
     cout << dec;
     cout << "ran:  " << setw(3) << tests << setw(8) << "(" << setw(4) << assertPass+assertFail << " assertions)" << endl;
     cout << "pass: " << setw(3) << pass <<  setw(8) << "(" << setw(4) << assertPass << " assertions)" << endl;

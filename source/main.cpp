@@ -1,21 +1,11 @@
-/** Example 006 2D Graphics
 
-This Tutorial shows how to do 2d graphics with the Irrlicht Engine.
-It shows how to draw images, keycolor based sprites,
-transparent rectangles, and different fonts. You may consider
-this useful if you want to make a 2d game with the engine, or if
-you want to draw a cool interface or head up display for your 3d game.
-
-As always, I include the header files, use the irr namespace,
-and tell the linker to link with the .lib file.
-*/
 #include "irrlicht.h"
 #include "render.h"
-#include "tests.h"
+#include "gameboy.h"
 
 #define NOCPU 0
 #define TILESET 0
-#define TEST 1
+#define TEST 0
 
 using namespace irr;
 
@@ -37,7 +27,7 @@ byte* initRam0() {
     byte* ram = new byte[0xFFFF];
     memset(ram, 0, 0xFFFF);
     pair t;
-    
+
     t.B.l = 0xAA;
     t.B.h = 0xAA;
     setTile0(ram, t, 0x01);
@@ -67,7 +57,7 @@ byte* initRam1() {
     byte* ram = new byte[0xFFFF];
     memset(ram, 0, 0xFFFF);
     pair t;
-    
+
     t.B.l = 0xFF;
     t.B.h = 0x00;
     setTile1(ram, t, 0x01);
@@ -80,7 +70,7 @@ byte* initRam1() {
     t.B.l = 0xC3;
     t.B.h = 0x0A;
     setTile1(ram, t, 0x04);
-    
+
     word base =  VRAM_BASE_ADDR + BGMAP_1_BASE_ADDR;
     for (byte i = 0; i < 0x0A; ++i) {
         ram[base + 0x20+i*2] = 0x01;
@@ -95,10 +85,7 @@ byte* initRam1() {
 int main()
 {
 	// create device
-#if TEST
-    RunAllCpuTests();
-#else // !TEST
-    
+
 #if NOCPU
 #if TILESET
     byte * ram = initRam1();
@@ -118,14 +105,13 @@ int main()
 		}
 	}
 
-    
+
 	r->device->drop();
     delete r;
     delete [] ram;
 #else // !NOCPU
     go();
 #endif // if NOCPU
-#endif // if TEST
 	return 0;
 }
 
