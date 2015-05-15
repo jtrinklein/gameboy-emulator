@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		A43D775A1AFBD864006D3FC7 /* pad.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A43D77581AFBD864006D3FC7 /* pad.cpp */; };
+		A49364541B03AC43006540AB /* apu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A49364531B03AC43006540AB /* apu.cpp */; };
+		A495D97C1B010045008531ED /* cpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A495D97A1B010045008531ED /* cpu.cpp */; };
 		A4A153A21AF477C600DA5F0E /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A4A153A11AF477C600DA5F0E /* Images.xcassets */; };
 		A4A153A51AF477C600DA5F0E /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = A4A153A31AF477C600DA5F0E /* MainMenu.xib */; };
 		A4A153B11AF477C600DA5F0E /* gameboyTests.m in Sources */ = {isa = PBXBuildFile; fileRef = A4A153B01AF477C600DA5F0E /* gameboyTests.m */; };
@@ -29,6 +32,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		A43D77581AFBD864006D3FC7 /* pad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pad.cpp; path = ../../../source/pad.cpp; sourceTree = "<group>"; };
+		A43D77591AFBD864006D3FC7 /* pad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pad.h; path = ../../../source/pad.h; sourceTree = "<group>"; };
+		A49364531B03AC43006540AB /* apu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = apu.cpp; path = ../../../source/apu.cpp; sourceTree = "<group>"; };
+		A49364551B03AC4D006540AB /* apu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apu.h; path = ../../../source/apu.h; sourceTree = "<group>"; };
+		A495D97A1B010045008531ED /* cpu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cpu.cpp; path = ../../../source/cpu.cpp; sourceTree = "<group>"; };
+		A495D97B1B010045008531ED /* cpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cpu.h; path = ../../../source/cpu.h; sourceTree = "<group>"; };
 		A4A153971AF477C600DA5F0E /* gameboy.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = gameboy.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		A4A1539B1AF477C600DA5F0E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A4A153A11AF477C600DA5F0E /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
@@ -73,6 +82,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		A495D97D1B01005C008531ED /* headers */ = {
+			isa = PBXGroup;
+			children = (
+				A49364551B03AC4D006540AB /* apu.h */,
+				A4A153C31AF4792F00DA5F0E /* cart.h */,
+				A495D97B1B010045008531ED /* cpu.h */,
+				A4A153C71AF4792F00DA5F0E /* cycles.h */,
+				A4A153BD1AF4792F00DA5F0E /* gameboy.h */,
+				A4A153C51AF4792F00DA5F0E /* GBCarts.h */,
+				A4E6CAAB1AF6CCD8001429CD /* mmu.h */,
+				A4A153BC1AF4792F00DA5F0E /* opcode.h */,
+				A4A153C21AF4792F00DA5F0E /* opcodeCB.h */,
+				A4A153C41AF4792F00DA5F0E /* opnames.h */,
+				A43D77591AFBD864006D3FC7 /* pad.h */,
+				A4A153C01AF4792F00DA5F0E /* render.h */,
+				A4E6CAAD1AF6CD2C001429CD /* types.h */,
+			);
+			name = headers;
+			sourceTree = "<group>";
+		};
 		A4A1538E1AF477C600DA5F0E = {
 			isa = PBXGroup;
 			children = (
@@ -94,23 +123,17 @@
 		A4A153991AF477C600DA5F0E /* gameboy */ = {
 			isa = PBXGroup;
 			children = (
-				A4E6CAAD1AF6CD2C001429CD /* types.h */,
-				A4E6CAAA1AF6CCD8001429CD /* mmu.cpp */,
-				A4E6CAAB1AF6CCD8001429CD /* mmu.h */,
-				A4A153BA1AF4792F00DA5F0E /* gameboy.cpp */,
-				A4A153BB1AF4792F00DA5F0E /* main.cpp */,
-				A4A153BC1AF4792F00DA5F0E /* opcode.h */,
-				A4A153BD1AF4792F00DA5F0E /* gameboy.h */,
+				A495D97D1B01005C008531ED /* headers */,
+				A49364531B03AC43006540AB /* apu.cpp */,
 				A4A153BE1AF4792F00DA5F0E /* cart.cpp */,
-				A4A153BF1AF4792F00DA5F0E /* render.cpp */,
-				A4A153C01AF4792F00DA5F0E /* render.h */,
-				A4A153C11AF4792F00DA5F0E /* bios.h */,
-				A4A153C21AF4792F00DA5F0E /* opcodeCB.h */,
-				A4A153C31AF4792F00DA5F0E /* cart.h */,
-				A4A153C41AF4792F00DA5F0E /* opnames.h */,
-				A4A153C51AF4792F00DA5F0E /* GBCarts.h */,
+				A495D97A1B010045008531ED /* cpu.cpp */,
+				A4A153BA1AF4792F00DA5F0E /* gameboy.cpp */,
 				A4A153C61AF4792F00DA5F0E /* GBCarts.c */,
-				A4A153C71AF4792F00DA5F0E /* cycles.h */,
+				A4A153BB1AF4792F00DA5F0E /* main.cpp */,
+				A4E6CAAA1AF6CCD8001429CD /* mmu.cpp */,
+				A43D77581AFBD864006D3FC7 /* pad.cpp */,
+				A4A153BF1AF4792F00DA5F0E /* render.cpp */,
+				A4A153C11AF4792F00DA5F0E /* bios.h */,
 				A4A153A11AF477C600DA5F0E /* Images.xcassets */,
 				A4A153A31AF477C600DA5F0E /* MainMenu.xib */,
 				A4A1539A1AF477C600DA5F0E /* Supporting Files */,
@@ -242,10 +265,13 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				A495D97C1B010045008531ED /* cpu.cpp in Sources */,
 				A4A153C81AF4792F00DA5F0E /* gameboy.cpp in Sources */,
 				A4A153C91AF4792F00DA5F0E /* main.cpp in Sources */,
 				A4A153CB1AF4792F00DA5F0E /* render.cpp in Sources */,
+				A43D775A1AFBD864006D3FC7 /* pad.cpp in Sources */,
 				A4E6CAAC1AF6CCD8001429CD /* mmu.cpp in Sources */,
+				A49364541B03AC43006540AB /* apu.cpp in Sources */,
 				A4A153CA1AF4792F00DA5F0E /* cart.cpp in Sources */,
 				A4A153CC1AF4792F00DA5F0E /* GBCarts.c in Sources */,
 			);
@@ -362,14 +388,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"../../irrlicht-1.8.1/include/",
+					../../irrlicht/include/,
+					"../../Gb_Snd_Emu/include/**",
 				);
 				INFOPLIST_FILE = gameboy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "../../irrlicht-1.8.1/lib/";
+				LIBRARY_SEARCH_PATHS = ../../lib/;
 				OTHER_LDFLAGS = (
 					"-framework",
 					OpenGL,
@@ -382,8 +410,10 @@
 					"-framework",
 					Foundation,
 					"-lIrrlicht",
+					"-lGbSndEmu",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = build;
 			};
 			name = Debug;
 		};
@@ -392,14 +422,16 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				COMBINE_HIDPI_IMAGES = YES;
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)";
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/include,
-					"../../irrlicht-1.8.1/include/",
+					../../irrlicht/include/,
+					"../../Gb_Snd_Emu/include/**",
 				);
 				INFOPLIST_FILE = gameboy/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
-				LIBRARY_SEARCH_PATHS = "../../irrlicht-1.8.1/lib/";
+				LIBRARY_SEARCH_PATHS = ../../lib/;
 				OTHER_LDFLAGS = (
 					"-framework",
 					OpenGL,
@@ -412,8 +444,10 @@
 					"-framework",
 					Foundation,
 					"-lIrrlicht",
+					"-lGbSndEmu",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SYMROOT = build;
 			};
 			name = Release;
 		};

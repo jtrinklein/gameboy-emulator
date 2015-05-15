@@ -62,7 +62,7 @@ CPU* testsetup() {
     c->mmu = new MMU();
     c->mmu->rom = new byte[0x8000];
     c->mmu->cart = new Cart("TEST");
-    c->gpu = new Render(c->mmu);
+    c->gpu = new GPU(c->mmu);
     return c;
 }
 

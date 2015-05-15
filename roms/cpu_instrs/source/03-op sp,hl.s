@@ -1,6 +1,6 @@
 ; Tests SP/HL instructions
 
-;.define PRINT_CHECKSUMS 1
+.define PRINT_CHECKSUMS 0
 .include "shell.inc"
 .include "instr_test.s"
 
@@ -48,7 +48,7 @@ values_loop:
      ld   a,(hl+)
      ld   h,(hl)
      ld   l,a
-;    call print_regs
+    call print_regs
      ld   sp,hl
      
      ; Set registers

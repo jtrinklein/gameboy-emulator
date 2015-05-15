@@ -26,12 +26,34 @@
 #define RS_STOP     0x02       /* 1: stop enabled            */
 
 #define IE_ENABLED  0xFF       /* 1: interrupts enabled      */
+#define IE_DISABLED 0x00
 
 #define IR_VBLANK   0x01
 #define IR_LCD      0x02
 #define IR_TIMER    0x04
 #define IR_SERIAL   0x08
 #define IR_JOYPAD   0x10
+
+#define INPUT_SRC_MASK   0x30
+#define INPUT_SRC_DPAD   0x10
+#define INPUT_SRC_BTNS   0x20
+
+#define INPUT_RIGHT      0x01
+#define INPUT_LEFT       0x02
+#define INPUT_UP         0x04
+#define INPUT_DOWN       0x08
+
+#define INPUT_BTN_A      0x01
+#define INPUT_BTN_B      0x02
+#define INPUT_BTN_START  0x04
+#define INPUT_BTN_SELECT 0x08
+
+
+#define LCD_COINCIDENCE                 0x04
+#define LCD_LYC_IRQ_ENABLED             0x40
+#define STAT_MODE_HBLANK_IRQ_ENABLED    0x08
+#define STAT_MODE_VBLANK_IRQ_ENABLED    0x10
+#define STAT_MODE_VRAM_OAM_IRQ_ENABLED  0x20
 
 #define DEF_ROM_OFFSET 0x4000
 #define DEF_RAM_OFFSET 0x0000
@@ -45,10 +67,13 @@ typedef union {
     word W;
 } pair;
 
-class Render;
+class Gameboy;
+class GPU;
 class MMU;
 class CPU;
 class Cart;
+class Pad;
+class APU;
 
 #endif
 

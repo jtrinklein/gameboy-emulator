@@ -1,17 +1,27 @@
 #include "irrlicht.h"
 #include "render.h"
+#include "gameboy.h"
 #include "mmu.h"
+#include "pad.h"
+
+#define PIXEL_WIDTH 160
+#define PIXEL_HEIGHT 144
+#define WINDOW_SCALE 3
 
 using namespace irr;
 
-Render::Render(MMU* mmu) {
-    this->OAM = mmu->oam;
-    this->VRAM = mmu->vram;
+static u32 transparentColor = PIXEL_WHITE;
+
+GPU::GPU(Gameboy* g) {
+    gb = g;
+    this->OAM = gb->mmu->oam;
+    this->VRAM = gb->mmu->vram;
     this->bgtile = 0;
     this->init();
     this->scanline = 0;
     this->SCX = 0;
     this->SCY = 0;
+    
     this->bgmap = 0;
     this->bgtile = 0;
     this->clock = 0;
@@ -19,44 +29,67 @@ Render::Render(MMU* mmu) {
     this->mode = MODE_OAM_READ;
 }
 
-#define PIXEL_WIDTH 160
-#define PIXEL_HEIGHT 144
-#define WINDOW_SCALE 3
-
-Render::~Render() {
+GPU::~GPU() {
 }
 
-void Render::init() {
-    this->colors[COLOR_BLACK] = video::SColor(PIXEL_BLACK);
-    this->colors[COLOR_DARK_GREY] = video::SColor(PIXEL_DARK_GREY);
-    this->colors[COLOR_LIGHT_GREY] = video::SColor(PIXEL_LIGHT_GREY);
-    this->colors[COLOR_WHITE] = video::SColor(PIXEL_WHITE);
+void GPU::init() {
+    colors[COLOR_BLACK] = video::SColor(PIXEL_BLACK);
+    colors[COLOR_DARK_GREY] = video::SColor(PIXEL_DARK_GREY);
+    colors[COLOR_LIGHT_GREY] = video::SColor(PIXEL_LIGHT_GREY);
+    colors[COLOR_WHITE] = video::SColor(PIXEL_WHITE);
     
-    this->palette[0] = COLOR_WHITE;
-    this->palette[1] = COLOR_LIGHT_GREY;
-    this->palette[2] = COLOR_DARK_GREY;
-    this->palette[3] = COLOR_BLACK;
+    bgPalette[0] = COLOR_WHITE;
+    bgPalette[1] = COLOR_LIGHT_GREY;
+    bgPalette[2] = COLOR_DARK_GREY;
+    bgPalette[3] = COLOR_BLACK;
     
-    this->device = irr::createDevice(video::EDT_OPENGL, core::dimension2d< u32 >(PIXEL_WIDTH*WINDOW_SCALE, PIXEL_HEIGHT*WINDOW_SCALE));
-    this->driver = this->device->getVideoDriver();
-    this->screenImage = driver->createImage(video::ECF_A8R8G8B8, core::dimension2d< u32 >(PIXEL_WIDTH, PIXEL_HEIGHT));
-    this->screenImage->fill(video::SColor(0xFF, 0xFF, 0xFF, 0xFF));
-    this->screenTexture = driver->addTexture("GB_SCREEN", this->screenImage);
+    oamPalette[0][0] = COLOR_WHITE;
+    oamPalette[0][1] = COLOR_LIGHT_GREY;
+    oamPalette[0][2] = COLOR_DARK_GREY;
+    oamPalette[0][3] = COLOR_BLACK;
+    
+    oamPalette[1][0] = COLOR_WHITE;
+    oamPalette[1][1] = COLOR_LIGHT_GREY;
+    oamPalette[1][2] = COLOR_DARK_GREY;
+    oamPalette[1][3] = COLOR_BLACK;
+    
+    device = irr::createDevice(video::EDT_OPENGL, core::dimension2d< u32 >(PIXEL_WIDTH*WINDOW_SCALE, PIXEL_HEIGHT*WINDOW_SCALE), 16, false, false, false, gb->pad);
+    driver = device->getVideoDriver();
+    screenImage = driver->createImage(video::ECF_A8R8G8B8, core::dimension2d< u32 >(PIXEL_WIDTH, PIXEL_HEIGHT));
+    screenImage->fill(video::SColor(0xFF, 0xFF, 0xFF, 0xFF));
+    screenTexture = driver->addTexture("GB_SCREEN", screenImage);
 }
 
-byte Render::getTileIdx(word addr) {
-    return this->readVRAM(addr);
+byte GPU::getTileIdx(word addr) {
+    word idxAddr = mapBase + addr;
+    return readVRAM(idxAddr);
 }
 
-video::SColor Render::getPixelColor(pair tile, byte pixelIdx) {
-    //high byte is first pixel section - (low bit)
-    //low byte is second pixel section - (high bit)
+video::SColor GPU::getBgPixelColor(pair tile, byte pixelIdx) {
+    //low byte is first pixel section - (low bit)
+    //high byte is second pixel section - (high bit)
     // pixel 0 is highest bit
-    byte colorIdx = (((tile.B.l >> (7 - pixelIdx)) & 0x01)<< 1) | ((tile.B.h >> (7 - pixelIdx)) & 0x01);
-    return this->colors[this->palette[colorIdx]];
+    byte colorIdx = (((tile.B.h >> (7 - pixelIdx)) & 0x01)<< 1) | ((tile.B.l >> (7 - pixelIdx)) & 0x01);
+    return colors[bgPalette[colorIdx]];
 }
 
-pair Render::getTileRow(byte idx, byte rowIdx) {
+video::SColor GPU::getSpritePixelColor(Sprite s, pair tile, byte pixelIdx) {
+    //low byte is first pixel section - (low bit)
+    //high byte is second pixel section - (high bit)
+    // pixel 0 is highest bit
+    byte colorIdx = (((tile.B.h >> (7 - pixelIdx)) & 0x01)<< 1) | ((tile.B.l >> (7 - pixelIdx)) & 0x01);
+    return colors[oamPalette[(s.flags & SPRITE_PALETTE)>>4][colorIdx]];
+}
+
+pair GPU::getSpriteTileRow(Sprite s, byte rowIdx){
+    word addr = tileBase + (s.tile*16) + rowIdx*2;
+    pair tile;
+    tile.B.l = readVRAM(addr);
+    tile.B.h = readVRAM(addr + 1);
+    return tile;
+}
+
+pair GPU::getTileRow(byte idx, byte rowIdx) {
     word addr = this->tileBase + (this->bgtile ? idx : (signedbyte)idx)*16 + rowIdx*2;
 
     pair p;
@@ -65,122 +98,150 @@ pair Render::getTileRow(byte idx, byte rowIdx) {
     return p;
 }
 
-bool Render::running() {
+bool GPU::running() {
     return this->device && this->device->run();
 }
 
-void Render::useTileset(byte id) {
-    if(id) {
-        this->tileBase = TILESET_1_BASE_ADDR;
-        this->bgtile = 1;
-    } else {
-        this->tileBase = TILESET_0_BASE_ADDR;
-        this->bgtile = 0;
-    }
+void GPU::useTileset(byte id) {
+    this->tileBase = id ? TILESET_1_BASE_ADDR : TILESET_0_BASE_ADDR;
+    this->bgtile = id;
 }
 
-void Render::useBgMap(byte id) {
+void GPU::useBgMap(byte id) {
     this->bgmap = id;
     this->mapBase =id ? BGMAP_1_BASE_ADDR : BGMAP_0_BASE_ADDR;
     
 
 }
 
-byte Render::readVRAM(word addr) {
+byte GPU::readVRAM(word addr) {
     return this->VRAM[VRAM_BASE_ADDR + addr];
 }
 
 #define GRID 0
 
-void Render::updateScreenPixel(u32 pixelX, byte pixelY, video::SColor color) {
+void GPU::updateScreenPixel(u32 pixelX, byte pixelY, video::SColor color) {
 
 #if GRID
     if(pixelX%8 == 0 || pixelY%8 == 0) {
-        this->texture[pixelX + (u32)pixelY*160] = this->palette[1].color;
+        texture[pixelX + (u32)pixelY*160] = bgPalette[1].color;
     } else {
-        this->texture[pixelX + (u32)pixelY*160] = this->palette[2].color;
+        texture[pixelX + (u32)pixelY*160] = bgPalette[2].color;
     }
 #else
-    this->texture[pixelX + (u32)pixelY * 160] = color.color;
+    texture[pixelX + (u32)pixelY * 160] = color.color;
 #endif
     
 }
 
-void Render::renderScanline() {
+void GPU::renderScanline() {
     
-    this->texture = (u32*)this->screenTexture->lock();
+    texture = (u32*)screenTexture->lock();
     
     // VRAM offset for the tile map
-    word mapoffset = this->mapBase;
-        
+    byte line = scanline + SCY;
+    
     // Which line of tiles to use in the map
-    byte rowoffset = ((this->scanline /*+ this->SCY*/) & 0xFF) >> 3;// y / 8 = y >> 3
-    mapoffset += rowoffset << 5; // r*32 = r << 5
+    byte rowoffset = line >> 3;// y / 8 = y >> 3
+    word yTileOffset = rowoffset << 5; // r*32 = r << 5
         
     // Which tile to start with in the map line
-    byte lineoffset = (this->SCX >> 3); // x / 8 = x >> 3
+    byte xTileOffset = (SCX >> 3) & 0x1F; // (x / 8)%32 = (x >> 3) & 0x1F
     
     // Which line of pixels to use in the tiles
-    byte pixelRowIdx = (this->scanline /*+ this->SCY*/) & 0x07;
-        
+    byte pixelRowIdx = line & 0x07;
+
     // Where in the tileline to start
-    byte x = this->SCX & 0x07;
+    byte x = SCX & 0x07;
     
-    byte tileIdx = this->getTileIdx(mapoffset + lineoffset);
-    pair tileRow = this->getTileRow(tileIdx, pixelRowIdx);
-    for( u32 px = 0; px < 160; ++px) {
-        // If the tile data set in use is #1, the
-        // indices are signed; calculate a real tile offset
-        //if(this->bgtile == 1) {
-        //    tile = (byte)(((signedbyte)tile) + 256);
-        //}
-        
-        
-        video::SColor c = this->getPixelColor(tileRow, x);
-        this->updateScreenPixel(px, this->scanline, c);
-        ++x;
-        if( x == 8) {
-            x = 0;
-            lineoffset = (lineoffset+1) & 0x1F;
-            tileIdx = this->getTileIdx(mapoffset + lineoffset);
-            tileRow = this->getTileRow(tileIdx, pixelRowIdx);
+    byte tileIdx = getTileIdx(yTileOffset + xTileOffset);
+    pair tileRow = getTileRow(tileIdx, pixelRowIdx);
+
+    if(bgEnabled) {
+        for( u32 px = 0; px < 160; ++px) {
+            video::SColor c = getBgPixelColor(tileRow, x);
+            updateScreenPixel(px, scanline, c);
+            ++x;
+            if( x == 8) {
+                x = 0;
+                xTileOffset = (xTileOffset+1) & 0x1F;
+                tileIdx = getTileIdx(yTileOffset + xTileOffset);
+                tileRow = getTileRow(tileIdx, pixelRowIdx);
+            }
         }
     }
-    this->screenTexture->unlock();
+    if(spritesEnabled) {
+        for (byte i = 0; i < 40; ++i) {
+            Sprite s;
+            s.y     = OAM[i*4] - 16;
+            s.x     = OAM[i*4 + 1] - 8;
+            s.tile  = OAM[i*4 + 2];
+            s.flags = OAM[i*4 + 3];
+
+            byte pixelRowIdx = (s.flags & SPRITE_Y_FLIP ? 7-(scanline - s.y) : (scanline - s.y)) & 0x7;
+            
+            // if sprite falls on scanline
+            if(s.y <= scanline && (s.y+8) >= scanline) {
+                pair tile = getSpriteTileRow(s, pixelRowIdx);
+
+                for(byte x = 0; x < 8; ++x) {
+                    byte pixelIdx = s.flags & SPRITE_X_FLIP ? 7-x : x;
+                    byte px = s.x + pixelIdx;
+
+                    bool bgIsTrans = pixelIsTransparent(px, scanline);
+                    if (px < PIXEL_WIDTH && (bgIsTrans || s.flags & SPRITE_PRIORITY)) {
+                        video::SColor sc = getSpritePixelColor(s, tile, pixelIdx);
+                        if (sc.color != colors[bgPalette[0]].color) {
+                            updateScreenPixel(px, scanline, sc);
+                        }
+                    }
+                }
+                
+            }
+        }
+    }
+    screenTexture->unlock();
+}
+bool GPU::pixelIsTransparent(byte x, byte y) {
+    return texture[x + y * PIXEL_WIDTH] == colors[bgPalette[0]].color;
 }
 
-void Render::drawScreen() {
-    this->driver->beginScene(true, true, video::SColor(255,33,12,0));
+void GPU::drawScreen() {
+    driver->beginScene(true, true, video::SColor(255,33,12,0));
     core::rect<s32> src = core::rect<s32>(0,0,PIXEL_WIDTH,PIXEL_HEIGHT);
     core::rect<s32> dst = core::rect<s32>(0,0,PIXEL_WIDTH*WINDOW_SCALE,PIXEL_HEIGHT*WINDOW_SCALE);
-    this->driver->enableMaterial2D();
-    //this->driver->draw2DImage(this->screenTexture, dst.UpperLeftCorner, dst,0,video::SColor(225,255,255,255),true);
-    this->driver->draw2DImage(this->screenTexture, dst,src);
-    this->driver->enableMaterial2D(false);
-    this->driver->endScene();
+    driver->draw2DImage(screenTexture, dst,src);
+    driver->endScene();
 }
 
-byte Render::getLCD() {
-    return this->LCD;
+byte GPU::getLCD() {
+    return LCD;
 }
 
-void Render::setLCD(byte data) {
-    this->LCD = data;
-    this->bgEnabled = data & 1;
-    this->spritesEnabled = (data >> 1) & 1;
-    this->largeSprites = (data >> 2) & 1;
-    this->useBgMap((data >> 3) & 1);
-    this->useTileset((data >> 4) & 1);
-    this->windowEnabled = (data >> 5) & 1;
-    this->windowMap = (data >> 6) & 1;
-    this->displayEnabled = (data >> 7) & 1;
+void GPU::setLCD(byte data) {
+    LCD = data;
+    bgEnabled = data & 1;
+    spritesEnabled = (data >> 1) & 1;
+    largeSprites = (data >> 2) & 1;
+    useBgMap((data >> 3) & 1);
+    useTileset((data >> 4) & 1);
+    windowEnabled = (data >> 5) & 1;
+    windowMap = (data >> 6) & 1;
+    displayEnabled = (data >> 7) & 1;
 }
 
-void Render::setPalette(byte data) {
-    this->palette[0] = data & 3;
-    this->palette[1] = (data >> 1) & 3;
-    this->palette[2] = (data >> 2) & 3;
-    this->palette[3] = (data >> 3) & 3;
+void GPU::setBgPalette(byte data) {
+    bgPalette[0] = data & 3;
+    bgPalette[1] = (data >> 2) & 3;
+    bgPalette[2] = (data >> 4) & 3;
+    bgPalette[3] = (data >> 6) & 3;
+}
+
+void GPU::setOamPalette(byte id, byte data) {
+    oamPalette[id][0] = data & 3;
+    oamPalette[id][1] = (data >> 2) & 3;
+    oamPalette[id][2] = (data >> 4) & 3;
+    oamPalette[id][3] = (data >> 6) & 3;
 }
 
 #define OAM_CYCLES 80
@@ -188,8 +249,20 @@ void Render::setPalette(byte data) {
 #define HBLANK_CYCLES 204
 #define VBLANK_CYCLES 456
 
+void GPU::checkLYC() {
+    if (scanline == gb->mmu->lyc) {
+        LCD |= LCD_COINCIDENCE;
+        
+        if (LCD & LCD_LYC_IRQ_ENABLED) {
+            gb->mmu->IF |= IR_LCD;
+        }
+    } else {
+        LCD &= ~LCD_COINCIDENCE;
+    }
+    
+}
 
-void Render::renderStep(byte cycleDelta) {
+void GPU::renderStep(byte cycleDelta) {
     this->clock += cycleDelta;
     
     switch (this->mode) {
@@ -204,17 +277,27 @@ void Render::renderStep(byte cycleDelta) {
                 this->clock -= VRAM_CYCLES;
                 this->mode = MODE_HBLANK;
                 this->renderScanline();
+                if ((gb->mmu->IE & IR_LCD) && (LCD & STAT_MODE_HBLANK_IRQ_ENABLED)) {
+                    gb->mmu->IF |= IR_LCD;
+                }
             }
             break;
         case MODE_HBLANK:
             if (this->clock >= HBLANK_CYCLES) {
                 this->clock -= HBLANK_CYCLES;
                 this->scanline++;
+                checkLYC();
                 if (this->scanline < PIXEL_HEIGHT) {
                     this->mode = MODE_OAM_READ;
                 } else {
                     this->mode = MODE_VBLANK;
                     this->drawScreen();
+                    
+                    gb->mmu->IF |= IR_LCD;
+                    
+                    if ((gb->mmu->IE & IR_LCD) && (LCD & STAT_MODE_VBLANK_IRQ_ENABLED)) {
+                        gb->mmu->IF |= IR_LCD;
+                    }
                 }
             }
             break;
@@ -225,6 +308,10 @@ void Render::renderStep(byte cycleDelta) {
                 if (this->scanline == (PIXEL_HEIGHT + 10)) {
                     this->mode = MODE_OAM_READ;
                     this->scanline = 0;
+                    
+                    if ((gb->mmu->IE & IR_LCD) && (LCD & STAT_MODE_VRAM_OAM_IRQ_ENABLED)) {
+                        gb->mmu->IF |= IR_LCD;
+                    }
                 }
             }
             break;

@@ -18,7 +18,7 @@ public:
     byte ramBanks;
     
     byte type;
-    const char* name;
+    const char *name, *typeName;
     byte *rom;
 private:
     bool checkLogo();

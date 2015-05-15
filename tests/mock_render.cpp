@@ -2,29 +2,29 @@
 #include "gameboy.h"
 
 
-Render::Render(MMU*) {
+GPU::GPU(MMU*) {
     this->SCX = this->SCY = this->scanline = 0;
     this->LCD = 0x81;
 }
 
-Render::~Render() {
+GPU::~GPU() {
 }
 
-bool Render::running() {
+bool GPU::running() {
     return true;
 }
 
-void Render::renderStep(byte /*cycleDelta*/) {
+void GPU::renderStep(byte /*cycleDelta*/) {
 }
 
-byte Render::getLCD() {
+byte GPU::getLCD() {
     return this->LCD;
 }
 
-void Render::setLCD(byte data) {
+void GPU::setLCD(byte data) {
     this->LCD = data;
 }
 
-void Render::setPalette(byte /*data*/){
+void GPU::setPalette(byte /*data*/){
 }
 

@@ -5,16 +5,43 @@
 #include "gameboy.h"
 #include "render.h"
 #include "cycles.h"
+#include <fstream>
 #include <stdio.h>
+#include <string>
 #include "bios.h"
+#include "cart.h"
 #include "mmu.h"
+#include "pad.h"
+#include "cpu.h"
+#include "apu.h"
+
+
+Gameboy::Gameboy() {
+    mmu = new MMU(this);
+    pad = new Pad(this);
+    cpu = new CPU(this);
+    gpu = new GPU(this);
+    apu = new APU();
+}
+
+Gameboy::~Gameboy() {
+    delete gpu;
+    delete cpu;
+    delete mmu;
+    delete pad;
+    delete apu;
+}
+
+void Gameboy::loadCart(const char* path) {
+    mmu->loadCart(path);
+}
 
 #define STRICT_ROMCHECK 0
 
 #if LOGGING
 #define LOG_ERR(x)  printf("ERROR: "); printf(x); printf("\n")
 #define LOG_WARN(x) printf("WARN : "); printf(x); printf("\n")
-#define LOG_INFO(x) printf("INFO : "); printf(x); printf("\n")
+#define LOG_INFO(x) printf("INFO : %s\n", x)
 #else
 #define LOG_ERR(x)  /**/
 #define LOG_WARN(x) /**/
@@ -32,95 +59,22 @@
 #define DPRINT_ARG(x,i) /**/
 #endif
 
-#include "cart.h"
 
-
+/*
 byte readMem(CPU* cpu, word A) {
     word addr = A;
-    if ((addr & 0xF000) == 0xF000) {
-        switch(addr&0x0F00) {
-            case 0xF00: // Zero-page RAM
-                if (addr == 0xFFFF) {
-                    return cpu->IE;
-                } else if (addr >= 0xFF80) {
-                    return cpu->mmu->read(addr);
-                }
-                else {
-                    switch (addr & 0x00FF) {
-                        case 0x0F: // Interrupt Flags
-                            return cpu->IF;
-                        case 0x40: // LCD Control
-                            return cpu->gpu->getLCD();
-                        case 0x42: //scx
-                            return cpu->gpu->SCX;
-                        case 0x43: // scy
-                            return cpu->gpu->SCY;
-                        case 0x44: // scanline
-                            return cpu->gpu->scanline;
-                    }
-                }
-                // 0xFF00 - 0xFF7F is IO, not handled yet
-                return 0;
-                break;
-            case 0xE00: // OAM
-                if(addr < 0xFEA0) {
-                    return cpu->mmu->read(addr);
-                }
-                return 0;
-            default: // Working RAM (shadow)
-                return cpu->mmu->read(addr);
-        }
-
-    }
-    
     return cpu->mmu->read(addr);
 }
 
 void writeMem(CPU* cpu, word A,byte V) {
     word addr = A;
-    if ((addr & 0xF000) == 0xF000) { //Working RAM (shadow), IO, Zero-page RAM
+    switch(addr) {
+        default:
+            cpu->mmu->write(addr, V);
+            break;
+    }
 
-        switch(addr&0x0F00) {
-            case 0xF00: // Zero-page RAM
-                if (addr >= 0xFF80) {
-                    cpu->mmu->write(addr, V);
-                }
-                else {
-                    switch (addr & 0x00FF) {
-                        case 0x40: // LCD Control
-                            cpu->gpu->setLCD(V);
-                            break;
-                        case 0x43: //scx
-                            cpu->gpu->SCX = V;
-                            break;
-                        case 0x42: // scy
-                            cpu->gpu->SCY = V;
-                            break;
-                        case 0x47: // scanline
-                            cpu->gpu->setPalette(V);
-                            break;
-                        default:
-                            cpu->mmu->write(addr, V);
-                            break;
-                    }
-                }
-                // 0xFF00 - 0xFF7F is IO, not handled yet
-                
-                break;
-            case 0xE00: // OAM
-                if(addr < 0xFEA0) {
-                    cpu->mmu->write(addr, V);
-                }
-                break;
-            default: // Working RAM (shadow)
-                cpu->mmu->write(addr, V);
-                break;
-        }
-    }
-    else {
-        cpu->mmu->write(A, V);
-    }
-}
+}*/
 
 #define READ(a) readMem(cpu, a)
 #define READ_INC() readMem(cpu, cpu->PC.W++)
@@ -215,7 +169,7 @@ void writeMem(CPU* cpu, word A,byte V) {
 
 #define SET(n,x)\
     x |= 1<<n
-
+/*
 void CPU::reset() {
     PC.W = 0x0000;
     SP.W = 0xF000;
@@ -225,26 +179,19 @@ void CPU::reset() {
     HL.W = 0x0000;
     ICycles = IPeriod;
     IRequest = INT_NONE;
-}
+}*/
 
-CPU::CPU() {
-    
-}
-CPU::~CPU() {
-    
-}
-
+/*
 byte getOp(CPU* cpu, word addr) {
     return readMem(cpu, addr);
 }
 
 void interrupt(CPU* cpu, byte vector) {
-    cpu->runState &= ~(RS_HALT); // clear HALT flag
     if (vector == INT_RST00) {
         cpu->PC.W = 0x0000;
     }
-}
-
+}*/
+/*
 void ExecCB(CPU* cpu) {
     byte I;
     pair J;
@@ -277,108 +224,221 @@ bool execOp(CPU* cpu, byte I) {
     return true;
 }
 
+
 void runGB(CPU* cpu) {
     byte I; // instruction
+    byte x = 0; // debugging
+    word irq = 0;
+    word pc;
     for(;cpu->gpu->running();) {
 
-        word pc = cpu->PC.W;
-        I = READ_INC(); //getop
-        
-        //herp = cpu->BC.B.l;
-        if(!execOp(cpu, I)) {
-            return;
+        pc = cpu->PC.W;
+        if (irq) {
+            PUSH(cpu->PC);
+            cpu->PC.W = irq;
+            cpu->opCycles = 12;
+            cpu->ICycles -= 12;
+        } else {
+            if( cpu->runState == RS_HALT) {
+                if( cpu->mmu->IE == IE_DISABLED) {
+                    I = READ(cpu->PC.W);
+                    cpu->runState &= ~(RS_HALT); // clear HALT flag
+                } else {
+                    I = 0x00;
+                }
+            } else {
+                I =  READ_INC(); //getop
+            }
+            const char*name = OpNameTable[I]; // debugging
+
+            if(pc > 0xc0e6) { // debugging
+                x = 0;
+            }
+            if(I == 0x40) { //debugging
+                x = 1;
+            }
+            if(!execOp(cpu, I)) {
+                return;
+            }
+        }
+        if(cpu->runState != RS_HALT) {
+            cpu->timerStep(cpu->opCycles >> 2); // opcycles / 4
         }
 
         cpu->gpu->renderStep(cpu->opCycles);
 
         if(cpu->ICycles <=0) {
             cpu->ICycles += cpu->IPeriod;
+
+
+            if (cpu->IME && cpu->IE && cpu->mmu->IF) {
+                cpu->runState &= ~(RS_HALT); // clear HALT flag
+
+                byte flagged = cpu->IE & cpu->mmu->IF;
+                if (flagged &IR_VBLANK) { // priority 1
+                    irq = 0x0040;
+                    cpu->mmu->IF &= ~IR_VBLANK;
+                    cpu->IME = 0;
+                }
+                if (flagged &IR_LCD) { // priority 2
+                    irq = 0x0048;
+                    cpu->mmu->IF &= ~IR_LCD;
+                    cpu->IME = 0;
+                }
+                if (flagged &IR_TIMER) { // priority 3
+                    irq = 0x0050;
+                    cpu->mmu->IF &= ~IR_TIMER;
+                    cpu->IME = 0;
+                }
+                if (flagged &IR_SERIAL) { // priority 4
+                    irq = 0x0058;
+                    cpu->mmu->IF &= ~IR_SERIAL;
+                    cpu->IME = 0;
+                }
+                if (flagged &IR_JOYPAD) { // priority 5
+                    irq = 0x0060;
+                    cpu->mmu->IF &= ~IR_JOYPAD;
+                    cpu->IME = 0;
+                }
+            }
         }
 
     }
 }
 
-void initCPU(CPU* cpu) {
-    cpu->init();
+static byte timerSpeed[4] = {64,1,4,16};
+void CPU::timerStep(byte cycles) {
+    ticker += cycles;
+    if(ticker >= 4) {
+        ticker -= 4;
+        timertick++;
+        if (mmu->tac & 0x4 && timertick >= timerSpeed[mmu->tac & 0x3]) {
+            timertick -= timerSpeed[mmu->tac & 0x3];
+            if (++mmu->tima == 0) {
+                mmu->tima = mmu->tma;
+                mmu->IF |= IR_TIMER;
+            }
+        }
+
+        if (++divtick == 16) {
+            divtick = 0;
+            mmu->div++;
+        }
+
+    }
+
 }
-void CPU::init() {
-    //cpu->inBios = 0x00;
-    PC.W = 0x100;
-    AF.B.h = 0x01;
-    AF.B.l = 0xB0;
-    BC.W = 0x0013;
-    DE.W = 0x00D8;
-    HL.W = 0x014D;
-    SP.W = 0xFFFE;
-    
-    CPU* cpu =this;
-    WRITE(0xFF05, 0x00) ;// TIMA
-    WRITE(0xFF06, 0x00) ;// TMA
-    WRITE(0xFF07, 0x00) ;// TAC
-    WRITE(0xFF10, 0x80) ;// NR10
-    WRITE(0xFF11, 0xBF) ;// NR11
-    WRITE(0xFF12, 0xF3) ;// NR12
-    WRITE(0xFF14, 0xBF) ;// NR14
-    WRITE(0xFF16, 0x3F) ;// NR21
-    WRITE(0xFF17, 0x00) ;// NR22
-    WRITE(0xFF19, 0xBF) ;// NR24
-    WRITE(0xFF1A, 0x7F) ;// NR30
-    WRITE(0xFF1B, 0xFF) ;// NR31
-    WRITE(0xFF1C, 0x9F) ;// NR32
-    WRITE(0xFF1E, 0xBF) ;// NR33
-    WRITE(0xFF20, 0xFF) ;// NR41
-    WRITE(0xFF21, 0x00) ;// NR42
-    WRITE(0xFF22, 0x00) ;// NR43
-    WRITE(0xFF23, 0xBF) ;// NR30
-    WRITE(0xFF24, 0x77) ;// NR50
-    WRITE(0xFF25, 0xF3) ;// NR51
-    WRITE(0xFF26, 0xF1) ;//-GB//, 0xF0-SGB ; NR52
-    WRITE(0xFF40, 0x91) ;// LCDC
-    WRITE(0xFF42, 0x00) ;// SCY
-    WRITE(0xFF43, 0x00) ;// SCX
-    WRITE(0xFF45, 0x00) ;// LYC
-    WRITE(0xFF47, 0xFC) ;// BGP
-    WRITE(0xFF48, 0xFF) ;// OBP0
-    WRITE(0xFF49, 0xFF) ;// OBP1
-    WRITE(0xFF4A, 0x00) ;// WY
-    WRITE(0xFF4B, 0x00) ;// WX
-    WRITE(0xFFFF, 0x00) ;// IE
+*/
+void initCPU(Gameboy* gb) {
+    gb->cpu->reset();
 }
 
-void cleanup(CPU* cpu) {
+void cleanup(Gameboy* gb) {
     LOG_INFO("cleanup");
-    delete cpu->mmu;
-    delete cpu->gpu;
-    delete cpu;
+    delete gb;
+}
+
+void loadGpuData(MMU* mmu) {
+    //0: 00000000 = 0x00
+    //1: 00111100 = 0x3C
+    //2: 01100110 = 0x66
+    //3: 01111110 = 0x7e
+    //4: 01100110 = 0x66
+    //5: 01100110 = 0x66
+    //6: 01100110 = 0x66
+    //7: 00000000 = 0x00
+    byte a[8] = {
+        0x00,
+        0x3c,
+        0x66,
+        0x7e,
+        0x66,
+        0x66,
+        0x66,
+        0x00};
+    //0: 00000000 = 0x00
+    //1: 01111100 = 0x7C
+    //2: 01100110 = 0x66
+    //3: 01111100 = 0x7c
+    //4: 01100110 = 0x66
+    //5: 01100110 = 0x66
+    //6: 01111100 = 0x7c
+    //7: 00000000 = 0x00
+    byte b[8] = {
+        0x00,
+        0x7c,
+        0x66,
+        0x7c,
+        0x66,
+        0x66,
+        0x7c,
+        0x00};
+    byte* tiledata = mmu->vram;
+    byte tiles = 22;
+    srand(123145);
+    for (byte t = 0; t < tiles; ++t) {
+        tiledata += 16;
+        for (byte i = 0; i < 16; ++i) {
+            tiledata[i] = rand() % 0x100;
+        }
+    }
+    for (word m = 0; m < 1024; ++m) {
+        mmu->vram[0x1800 + m] = rand() % tiles;
+    }
+
+}
+void Gameboy::runBios(const char *path) {
+    bios = nullptr;
+    std::ifstream file(path, std::ios::in|std::ios::binary|std::ios::ate);
+    
+    if (file.is_open()) {
+        std::ifstream::pos_type size = file.tellg();
+        file.seekg(0, std::ios::beg);
+        bios = new byte[size];
+        file.read((char*)bios, size);
+        file.close();
+    }
+    cpu->runBios(bios);
+    delete [] bios;
 }
 
 void go() {
 //    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/cpu_instrs/cpu_instrs.gb";
-    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/cpu_instrs/individual/01-special.gb";
-//    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/cpu_instrs/individual/03-op sp,hl.gb";
-//    const char *file = "/Users/jtrinklein/gameboy/emulator/roms/instr_timing/instr_timing.gb";
+//    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/cpu_instrs/individual/01-special.gb";
+//    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/
+    std::string biosPath = "/Users/jtrinklein/src/gameboy/emulator/roms/bios.bin";
+    std::string path = "/Users/jtrinklein/src/gameboy/emulator/roms/";
+    //**/    path += "cpu_instrs/individual/06-ld r,r.gb";
+    /**/    path += "cpu_instrs/cpu_instrs.gb";
+
+    //**/    path += "cpu_instrs/individual/01-special.gb";
+
+    //**/    path += "cpu_instrs/individual/10-bit ops.gb";
+    //**/    path += "blocks.gb";
+//**/    path += "test.gb";
+//**/    path += "cpu_instrs/individual/03-op sp,hl.gb";
+//**/   path += "instr_timing/instr_timing.gb";
     LOG_INFO("loading rom:");
-    LOG_INFO(file);
+    LOG_INFO(path.c_str());
 
+    Gameboy* gb = new Gameboy();
 
-    CPU* cpu = new CPU();
-    cpu->mmu = new MMU();
-    cpu->gpu = new Render(cpu->mmu);
-    initCPU(cpu);
-    cpu->mmu->loadCart(file);
+    initCPU(gb);
+    gb->loadCart(path.c_str());
 
+    gb->runBios(biosPath.c_str());
     LOG_INFO("check graphic");
-    if(!cpu->mmu->cart->isLogoValid) {
+    if(!gb->mmu->cart->isLogoValid) {
         if(STRICT_ROMCHECK) {
             LOG_ERR("Nintendo Logo is corrupted!");
-            cleanup(cpu);
+            cleanup(gb);
         } else {
             LOG_WARN("Nintendo Logo is corrupted! This would fail normal hardware");
         }
     }
     LOG_INFO("starting cpu");
-    
-    runGB(cpu);
-    
-    cleanup(cpu);
+
+    gb->cpu->run();
+
+    cleanup(gb);
 }

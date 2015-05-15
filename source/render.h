@@ -66,16 +66,26 @@
 #define MODE_HBLANK 2
 #define MODE_VBLANK 3
 
-class Render {
+#define SPRITE_PRIORITY 0x80
+#define SPRITE_Y_FLIP 0x40
+#define SPRITE_X_FLIP 0x20
+#define SPRITE_PALETTE 0x10
+
+typedef struct {
+    byte flags,tile,x,y;
+} Sprite;
+
+class GPU {
 public:
-    Render(MMU* mmu);
-    ~Render();
+    GPU(Gameboy* mmu);
+    ~GPU();
     bool running();
     void renderStep(byte cycleDelta);
     byte SCY, SCX, scanline;
     byte getLCD();
     void setLCD(byte data);
-    void setPalette(byte data);
+    void setBgPalette(byte data);
+    void setOamPalette(byte id, byte data);
 private:
     word mapBase, tileBase, clock;
     
@@ -83,9 +93,10 @@ private:
     byte mode, LCD;
     
     byte *OAM, *VRAM;
+    Gameboy* gb;
     
     COLOR colors[4];
-    byte palette[4];
+    byte bgPalette[4], oamPalette[2][4];
     
     DRIVER driver;
     DEVICE device;
@@ -101,14 +112,16 @@ private:
     void updateScreenImage();
     void updateScreenPixel(U32 pixelX, byte pixelY, COLOR color);
     byte readVRAM(word addr);
-    COLOR getPixelColor(pair tile, byte pixelIdx);
-    
+    COLOR getBgPixelColor(pair tile, byte pixelIdx);
+    COLOR getSpritePixelColor(Sprite s, pair tile, byte pixelIdx);
+    pair getSpriteTileRow(Sprite s, byte rowIdx);
+    void checkLYC();
     void updateImageFromTiles();
     void init();
     void resetTileData();
     byte getTileIdx(word addr);
     pair getTileRow(byte tileIdx, byte rowIdx);
-    
+    bool pixelIsTransparent(byte x, byte y);
     byte bgtile; // tileset 0 or 1
     
     byte bgmap; // background map 0 or 1

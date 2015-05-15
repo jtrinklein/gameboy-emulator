@@ -15,18 +15,21 @@ typedef struct {
 
 class MMU {
 public:
-    MMU();
+    MMU(Gameboy* gb);
     ~MMU();
-    
+
     void reset();
     byte read(word addr);
     void write(word addr, byte value);
     void loadCart(const char *path);
-    
+    Gameboy *gb;
     byte *rom, *ram, *eram, *zram, *wram, *vram, *oam;
     Cart *cart;
-    byte serialBuffer, serialCtrl;
-    
+    byte serialBuffer, serialCtrl, lyc,div,tac,tma,tima,p1;
+    byte IF; // Interrupt flag register
+    byte IE; // Interrupt flag register
+    byte keys[3];
+    bool inBios;
 private:
     byte scount = 0;
     void writeSerial();
@@ -34,10 +37,9 @@ private:
     byte cartType;
     MBCState mbcState;
     MBCState states[2];
-    
+
     void setMBCState();
-    
+
 };
 
 #endif
-
