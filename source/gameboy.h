@@ -16,9 +16,10 @@ class Gameboy {
     GPU* gpu;
     Pad* pad;
     APU* apu;
-    
+
     byte* bios;
 
+    void run();
     void runBios(const char *path);
     void loadCart(const char *path);
 };
@@ -57,7 +58,7 @@ bool execOp(CPU* cpu, byte I);
 void runGB(CPU* gb);
 void initCPU(CPU* cpu);
 
-void go();
+void go(bool skipBios);
 #ifdef __cplusplus
 }
 #endif

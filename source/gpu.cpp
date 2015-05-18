@@ -1,5 +1,6 @@
+#include <time.h>
 #include "irrlicht.h"
-#include "render.h"
+#include "gpu.h"
 #include "gameboy.h"
 #include "mmu.h"
 #include "pad.h"
@@ -8,31 +9,44 @@
 #define PIXEL_HEIGHT 144
 #define WINDOW_SCALE 3
 
+#define NO_LCD 1
 using namespace irr;
 
 static u32 transparentColor = PIXEL_WHITE;
-
+#ifdef NO_LCD
+static u32 *pixelArray = nullptr;
+#endif
 GPU::GPU(Gameboy* g) {
     gb = g;
-    this->OAM = gb->mmu->oam;
-    this->VRAM = gb->mmu->vram;
-    this->bgtile = 0;
-    this->init();
-    this->scanline = 0;
-    this->SCX = 0;
-    this->SCY = 0;
+    OAM = gb->mmu->oam;
+    VRAM = gb->mmu->vram;
+    bgtile = 0;
+    init();
+    scanline = 0;
+    SCX = 0;
+    SCY = 0;
     
-    this->bgmap = 0;
-    this->bgtile = 0;
-    this->clock = 0;
-    this->setLCD(0x81);
-    this->mode = MODE_OAM_READ;
+    bgmap = 0;
+    bgtile = 0;
+    clock = 0;
+    setLCD(0x81);
+    mode = MODE_OAM_READ;
 }
 
 GPU::~GPU() {
+#ifdef NO_LCD
+    if (pixelArray != nullptr) {
+        delete [] pixelArray;
+    }
+#endif
 }
 
 void GPU::init() {
+#ifdef NO_LCD
+    if(pixelArray == nullptr) {
+        pixelArray = new u32[0x6040];
+    }
+#endif
     colors[COLOR_BLACK] = video::SColor(PIXEL_BLACK);
     colors[COLOR_DARK_GREY] = video::SColor(PIXEL_DARK_GREY);
     colors[COLOR_LIGHT_GREY] = video::SColor(PIXEL_LIGHT_GREY);
@@ -53,11 +67,13 @@ void GPU::init() {
     oamPalette[1][2] = COLOR_DARK_GREY;
     oamPalette[1][3] = COLOR_BLACK;
     
+#ifndef NO_LCD
     device = irr::createDevice(video::EDT_OPENGL, core::dimension2d< u32 >(PIXEL_WIDTH*WINDOW_SCALE, PIXEL_HEIGHT*WINDOW_SCALE), 16, false, false, false, gb->pad);
     driver = device->getVideoDriver();
     screenImage = driver->createImage(video::ECF_A8R8G8B8, core::dimension2d< u32 >(PIXEL_WIDTH, PIXEL_HEIGHT));
     screenImage->fill(video::SColor(0xFF, 0xFF, 0xFF, 0xFF));
     screenTexture = driver->addTexture("GB_SCREEN", screenImage);
+#endif
 }
 
 byte GPU::getTileIdx(word addr) {
@@ -90,53 +106,50 @@ pair GPU::getSpriteTileRow(Sprite s, byte rowIdx){
 }
 
 pair GPU::getTileRow(byte idx, byte rowIdx) {
-    word addr = this->tileBase + (this->bgtile ? idx : (signedbyte)idx)*16 + rowIdx*2;
+    word addr = tileBase + (bgtile ? idx : (signedbyte)idx)*16 + rowIdx*2;
 
     pair p;
-    p.B.l = this->readVRAM(addr);
-    p.B.h = this->readVRAM(addr + 1);
+    p.B.l = readVRAM(addr);
+    p.B.h = readVRAM(addr + 1);
     return p;
 }
 
 bool GPU::running() {
-    return this->device && this->device->run();
+#ifdef NO_LCD
+    return true;
+#else
+    return device && device->run();
+#endif
 }
 
 void GPU::useTileset(byte id) {
-    this->tileBase = id ? TILESET_1_BASE_ADDR : TILESET_0_BASE_ADDR;
-    this->bgtile = id;
+    tileBase = id ? TILESET_1_BASE_ADDR : TILESET_0_BASE_ADDR;
+    bgtile = id;
 }
 
 void GPU::useBgMap(byte id) {
-    this->bgmap = id;
-    this->mapBase =id ? BGMAP_1_BASE_ADDR : BGMAP_0_BASE_ADDR;
+    bgmap = id;
+    mapBase =id ? BGMAP_1_BASE_ADDR : BGMAP_0_BASE_ADDR;
     
 
 }
 
 byte GPU::readVRAM(word addr) {
-    return this->VRAM[VRAM_BASE_ADDR + addr];
+    return VRAM[VRAM_BASE_ADDR + addr];
 }
 
 #define GRID 0
 
 void GPU::updateScreenPixel(u32 pixelX, byte pixelY, video::SColor color) {
-
-#if GRID
-    if(pixelX%8 == 0 || pixelY%8 == 0) {
-        texture[pixelX + (u32)pixelY*160] = bgPalette[1].color;
-    } else {
-        texture[pixelX + (u32)pixelY*160] = bgPalette[2].color;
-    }
-#else
     texture[pixelX + (u32)pixelY * 160] = color.color;
-#endif
-    
 }
 
 void GPU::renderScanline() {
-    
+#ifdef NO_LCD
+    texture = pixelArray;
+#else
     texture = (u32*)screenTexture->lock();
+#endif
     
     // VRAM offset for the tile map
     byte line = scanline + SCY;
@@ -200,18 +213,22 @@ void GPU::renderScanline() {
             }
         }
     }
+#ifndef NO_LCD
     screenTexture->unlock();
+#endif
 }
 bool GPU::pixelIsTransparent(byte x, byte y) {
     return texture[x + y * PIXEL_WIDTH] == colors[bgPalette[0]].color;
 }
 
 void GPU::drawScreen() {
+#ifndef NO_LCD
     driver->beginScene(true, true, video::SColor(255,33,12,0));
     core::rect<s32> src = core::rect<s32>(0,0,PIXEL_WIDTH,PIXEL_HEIGHT);
     core::rect<s32> dst = core::rect<s32>(0,0,PIXEL_WIDTH*WINDOW_SCALE,PIXEL_HEIGHT*WINDOW_SCALE);
     driver->draw2DImage(screenTexture, dst,src);
     driver->endScene();
+#endif
 }
 
 byte GPU::getLCD() {
@@ -261,37 +278,35 @@ void GPU::checkLYC() {
     }
     
 }
-
 void GPU::renderStep(byte cycleDelta) {
-    this->clock += cycleDelta;
-    
-    switch (this->mode) {
+    clock += cycleDelta;
+    switch (mode) {
         case MODE_OAM_READ:
-            if(this->clock >= OAM_CYCLES) {
-                this->clock -= OAM_CYCLES;
-                this->mode = MODE_VRAM_READ;
+            if(clock >= OAM_CYCLES) {
+                clock = 0;
+                mode = MODE_VRAM_READ;
             }
             break;
         case MODE_VRAM_READ:
-            if(this->clock >= VRAM_CYCLES) {
-                this->clock -= VRAM_CYCLES;
-                this->mode = MODE_HBLANK;
-                this->renderScanline();
+            if(clock >= VRAM_CYCLES) {
+                clock = 0;
+                mode = MODE_HBLANK;
+                renderScanline();
                 if ((gb->mmu->IE & IR_LCD) && (LCD & STAT_MODE_HBLANK_IRQ_ENABLED)) {
                     gb->mmu->IF |= IR_LCD;
                 }
             }
             break;
         case MODE_HBLANK:
-            if (this->clock >= HBLANK_CYCLES) {
-                this->clock -= HBLANK_CYCLES;
-                this->scanline++;
+            if (clock >= HBLANK_CYCLES) {
+                clock = 0;
+                scanline++;
                 checkLYC();
-                if (this->scanline < PIXEL_HEIGHT) {
-                    this->mode = MODE_OAM_READ;
+                if (scanline < PIXEL_HEIGHT) {
+                    mode = MODE_OAM_READ;
                 } else {
-                    this->mode = MODE_VBLANK;
-                    this->drawScreen();
+                    mode = MODE_VBLANK;
+                    drawScreen();
                     
                     gb->mmu->IF |= IR_LCD;
                     
@@ -302,12 +317,13 @@ void GPU::renderStep(byte cycleDelta) {
             }
             break;
         case MODE_VBLANK:
-            if(this->clock >= VBLANK_CYCLES) {
-                this->clock -= VBLANK_CYCLES;
-                this->scanline++;
-                if (this->scanline == (PIXEL_HEIGHT + 10)) {
-                    this->mode = MODE_OAM_READ;
-                    this->scanline = 0;
+            if(clock >= VBLANK_CYCLES) {
+                clock = 0;
+                scanline++;
+                if (scanline == 154) {
+                    mode = MODE_OAM_READ;
+                    scanline = 0;
+                    clock = 0;
                     
                     if ((gb->mmu->IE & IR_LCD) && (LCD & STAT_MODE_VRAM_OAM_IRQ_ENABLED)) {
                         gb->mmu->IF |= IR_LCD;

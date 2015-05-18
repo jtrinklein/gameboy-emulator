@@ -15,7 +15,7 @@ OP(0x10) // STOP
     runState = RS_STOP;
 END
 
-OP(0x27) // DDA
+OP(0x27) // DAA
     I = AF.B.h;
     AF.B.h += (((AF.B.h&0x0F)>0x09)||(AF.B.l&FLAG_H)) ? 0x06 : 0;
     AF.B.h += (((AF.B.h&0xF0)>0x90)||(AF.B.l&FLAG_C)) ? 0x60 : 0;
@@ -487,19 +487,19 @@ END
 
 //ROTATE
 OP(0x07) // RLCA
-    RLC_X(AF.B.h);
+    RLC(AF.B.h);
 END
 
 OP(0x17) // RLA
-    RL_X(AF.B.h);
+    RL(AF.B.h);
 END
 
 OP(0x0F) // RRCA
-    RRC_X(AF.B.h);
+    RRC(AF.B.h);
 END
 
 OP(0x1F) // RRA
-    RR_X(AF.B.h);
+    RR(AF.B.h);
 END
 
 // JP
@@ -878,12 +878,13 @@ OP(0xAD) // XOR A, L
     XOR_A(HL.B.l);
 END
 
-OP(0xAE) // XOR A, A
-    XOR_A(AF.B.h);
+OP(0xAE) // XOR A, (HL)
+    XOR_A(READ(HL.W));
 END
 
-OP(0xAF) // XOR A, (HL)
-    XOR_A(READ(HL.W));
+OP(0xAF) // XOR A, A
+    AF.B.h ^= AF.B.h;
+    AF.B.l = (AF.B.h?0:FLAG_Z);
 END
 
 OP(0xEE) // XOR A, n
@@ -942,6 +943,7 @@ END
 
 OP(0xF1) // POP AF
     POP(AF);
+    AF.B.l &= 0xF0;
 END
 
 // PUSH xx

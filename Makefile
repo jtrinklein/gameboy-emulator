@@ -3,7 +3,7 @@ CC=g++
 CXXFLAGS=-g -Wall -W -std=c++11
 LDFLAGS=-L./lib
 LDLIBS=-framework OpenGL -framework AppKit -framework IOKit -framework Carbon -framework Foundation -lGbSndEmu -lIrrlicht
-OBJ=libcarts.o cart.o gameboy.o render.o pad.o mmu.o cpu.o apu.o main.o
+OBJ=libcarts.o cart.o gameboy.o gpu.o pad.o mmu.o cpu.o apu.o main.o
 testOBJ=libcarts.o cart.o cpu_tests.o mock_render.o test_gameboy.o
 INCLUDE=-I ./irrlicht/include -I ./source -I ./Gb_Snd_Emu/include -I Gb_Snd_Emu/include/gb_apu
 testINCLUDE=-I ./source -I ./tests
@@ -18,8 +18,8 @@ main.o:
 apu.o:
 	$(CC) $(CXXFLAGS) -o $@ $(INCLUDE) -c source/apu.cpp
 
-render.o:
-	$(CC) $(CXXFLAGS) -o $@ $(INCLUDE) -c source/render.cpp
+gpu.o:
+	$(CC) $(CXXFLAGS) -o $@ $(INCLUDE) -c source/gpu.cpp
 
 mmu.o:
 	$(CC) $(CXXFLAGS) -o $@ $(INCLUDE) -c source/mmu.cpp

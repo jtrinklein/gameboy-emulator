@@ -2,9 +2,12 @@
 #include "irrlicht.h"
 #include "gameboy.h"
 #include "mmu.h"
+#include <iostream>
 
 using namespace irr;
 Pad::Pad(Gameboy* gb) {
+    
+    std::cout << "PAD - ctor" << std::endl;
     mmu = gb->mmu;
     mmu->keys[0] = 0;
     mmu->keys[1] = 0;
@@ -17,6 +20,7 @@ Pad::Pad(Gameboy* gb) {
     bindDown(KEY_DOWN);
     bindLeft(KEY_LEFT);
     bindRight(KEY_RIGHT);
+    std::cout << "PAD - ctor finished" << std::endl;
 }
 
 Pad::~Pad() {

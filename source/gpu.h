@@ -1,5 +1,5 @@
-#ifndef __RENDER_H__
-#define __RENDER_H__
+#ifndef __GPU_H__
+#define __GPU_H__
 
 #ifdef BUILD_TEST
 #define U32 unsigned int

@@ -2,11 +2,13 @@
 #include <iostream>
 #include "mmu.h"
 #include "gameboy.h"
-#include "render.h"
+#include "gpu.h"
 #include "apu.h"
 #include "cart.h"
+#include "logo.h"
 
 MMU::MMU(Gameboy* g) {
+    std::cout << "creating memory banks" << std::endl;
     gb = g;
     ram = new byte[0x2000];
     vram = new byte[0x2000];
@@ -14,6 +16,8 @@ MMU::MMU(Gameboy* g) {
     wram = new byte[0x2000];
     oam = new byte[0x100];
     zram = new byte[0x1000];
+    std::cout << "finished creating memory banks" << std::endl;
+    inBios = false;
     cart = nullptr;
     reset();
 }
@@ -47,6 +51,8 @@ MMU::~MMU() {
 
 
 void MMU::reset() {
+    
+    std::cout << "MMU - reset" << std::endl;
     if (cart != nullptr) {
         delete cart;
         cart = nullptr;
@@ -66,8 +72,16 @@ byte MMU::read(word A) {
     word addr = A;
     switch (addr&0xF000){
         case 0x0000://BIOS
-            if (inBios && addr < 0x100) {
-                return gb->bios[addr];
+            if (inBios) {
+                if(addr < 0x100) {
+                    if(addr >= 0xD8 && addr < 0xE0) {
+                        return rIcon[addr - 0xD8];
+                    }
+                    return gb->bios[addr];
+                }
+                else if (addr >= 0x104 && addr <= 0x133) {
+                    return logo[addr - 0x104];
+                }
             }
         case 0x1000:
         case 0x2000:
@@ -106,47 +120,48 @@ byte MMU::read(word A) {
                                 return serialCtrl;
                             case 0x04:
                                 return div;
-                                
+
                             case 0x14: //NR14 - Channel 1 frequency hi
                             case 0x19: //NR24 - Channel 2 frequency hi
                             case 0x1E: //NR34 - Channel 3 Frequency hi
-                                return gb->apu->read(addr) & 0x40; // only bit 6 is readable xBxxxxxx
-                                
+                                //return gb->apu->read(addr) & 0x40; // only bit 6 is readable xBxxxxxx
+
                                 //Tone & Sweep
                             case 0x10: //NR10 - Channel 1 Sweep register
                             case 0x11: //NR11 - Channel 1 sound length/wave pattern duty
                             case 0x12: //NR12 - Channel 1 volume envelope
-                                return gb->apu->read(addr);
-                                
+                                //return gb->apu->read(addr);
+
                                 //Tone
                             case 0x16: //NR21 - Channel 2 sound length/wave pattern duty
                             case 0x17: //NR22 - Channel 2 volume envelope
-                                return gb->apu->read(addr);
-                                
+                                //return gb->apu->read(addr);
+
                                 //Noise
                             case 0x20: //NR40 - Channel 4 sound length
                             case 0x21: //NR41 - Channel 4 volume envelope
                             case 0x22: //NR42 - Channel 4 polynomial counter
                             case 0x23: //NR43 - Channel 4 counter/consecutive; initial
-                                return gb->apu->read(addr);
-                                
+                                //return gb->apu->read(addr);
+
                                 //Sound control
                             case 0x26: //NR52 - Sound on/off
                             case 0x24: //NR50 - Channel control / on-off / Volume
                             case 0x25: //NR51 - Selection of sound output terminal
-                                
+
                                 //Wave Pattern RAM
                             case 0x30: case 0x31: case 0x32: case 0x33:
                             case 0x34: case 0x35: case 0x36: case 0x37:
                             case 0x38: case 0x39: case 0x3A: case 0x3B:
                             case 0x3C: case 0x3D: case 0x3E: case 0x3F:
-                                
+
                                 //Wave Output
                             case 0x1A: //NR30 - Channel 3 sound on/off
                             case 0x1B: //NR31 - Channel 3 Sound length
                             case 0x1C: //NR32 - Channel 3 select output level
-                                return gb->apu->read(addr);
-                                
+                                return 0;
+                                //return gb->apu->read(addr);
+
                             case 0x40:// LCDC
                                 return gb->gpu->getLCD();
                             case 0x42:// SCY
@@ -272,48 +287,48 @@ void MMU::write(word addr,byte val) {
                                     zram[addr & 0x7f] = serialCtrl;
                                 }
                                 break;
-                                
+
                                 //Sound control
                             case 0x26: //NR52 - Sound on/off
                                 val &= 0x80; // only bit 7 is writable Bxxxxxx for on/off register
                             case 0x24: //NR50 - Channel control / on-off / Volume
                             case 0x25: //NR51 - Selection of sound output terminal
-                                
+
                                 //Tone & Sweep
                             case 0x10: //NR10 - Channel 1 Sweep register
                             case 0x11: //NR11 - Channel 1 sound length/wave pattern duty
                             case 0x12: //NR12 - Channel 1 volume envelope
                             case 0x13: //NR13 - Channel 1 frequency low
                             case 0x14: //NR14 - Channel 1 frequency hi
-                                
+
                                 //Tone
                             case 0x16: //NR21 - Channel 2 sound length/wave pattern duty
                             case 0x17: //NR22 - Channel 2 volume envelope
                             case 0x18: //NR23 - Channel 2 frequency low
                             case 0x19: //NR24 - Channel 2 frequency hi
-                                
+
                                 //Wave Output
                             case 0x1A: //NR30 - Channel 3 sound on/off
                             case 0x1B: //NR31 - Channel 3 Sound length
                             case 0x1C: //NR32 - Channel 3 select output level
                             case 0x1D: //NR33 - Channel 3 Frequency low
                             case 0x1E: //NR34 - Channel 3 Frequency hi
-                                
+
                                 //Noise
                             case 0x20: //NR40 - Channel 4 sound length
                             case 0x21: //NR41 - Channel 4 volume envelope
                             case 0x22: //NR42 - Channel 4 polynomial counter
                             case 0x23: //NR43 - Channel 4 counter/consecutive; initial
-                                
+
                                 //Wave Pattern RAM
                             case 0x30: case 0x31: case 0x32: case 0x33:
                             case 0x34: case 0x35: case 0x36: case 0x37:
                             case 0x38: case 0x39: case 0x3A: case 0x3B:
                             case 0x3C: case 0x3D: case 0x3E: case 0x3F:
-                                
-                                gb->apu->write(addr, val);
+
+                                //gb->apu->write(addr, val);
                                 break;
-                                
+
                             case 0x40: // Zero-page RAM
                                 gb->gpu->setLCD(val);
                                 break;
@@ -388,7 +403,8 @@ void MMU::writeSerial() {
 
 
 void MMU::loadCart(const char *path) {
-
+    
+    std::cout << "MMU - Load cart" << std::endl;
     cart = new Cart(path);
     if(cart->loadOk) {
         rom = cart->rom;

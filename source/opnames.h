@@ -1,4 +1,4 @@
-const char *OpNameTable[] = {
+static const char *OpNameTable[] = {
     "NOP",
     "LD BC,d16",
     "LD (BC),A",

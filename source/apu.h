@@ -10,7 +10,7 @@ class APU {
 public:
     APU();
     ~APU();
-    
+    /*
     void reset();
     void step(byte cycles);
     byte read(word addr);
@@ -22,7 +22,7 @@ public:
     Gb_Apu apu;
     Stereo_Buffer sbuff;
     gb_time_t time;
-    
+    */
 private:
 };
 

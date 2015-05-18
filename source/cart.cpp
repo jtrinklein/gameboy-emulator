@@ -13,6 +13,8 @@ static byte RamBanks[4] = { 1, 1, 4, 16 };
 
 Cart::Cart(const char *path) {
     rom = NULL;
+    loadOk = loadRom(path);
+    /*
     if(!strncmp(path, "TEST", 4)) {
         rom = new byte[0x8000];
         type = 0x02; // mbc1 + ram
@@ -23,7 +25,7 @@ Cart::Cart(const char *path) {
         ramBanks = 1;
     } else {
         loadOk = loadRom(path);
-    }
+    }*/
     
 }
 
@@ -41,12 +43,13 @@ bool Cart::loadRom(const char *path) {
     rom = NULL;
     isLogoValid = isCRCValid = isCMPValid = false;
     romBanks = ramBanks = romSize = ramSize = type = 0x00;
-    
+    std::cout << "loading rom" << std::endl;
     std::ifstream file(path, std::ios::in|std::ios::binary|std::ios::ate);
 
     if (file.is_open()) {
         std::ifstream::pos_type size = file.tellg();
         file.seekg(0, std::ios::beg);
+        std::cout << "rom size (bytes): " << std::dec << size << std::hex << std::endl;
         rom = new byte[size];
         file.read((char*)rom, size);
         file.close();

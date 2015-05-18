@@ -6,12 +6,12 @@
 const gb_time_t FRAME_LENGTH = 70224;
 
 APU::APU() {
-    reset();
+    
 }
 
 APU::~APU() {
 }
-
+/*
 void APU::reset() {
     time = 0;
     apu.output(sbuff.center(), sbuff.left(), sbuff.right());
@@ -39,4 +39,4 @@ void APU::frameEnd() {
     sbuff.end_frame(FRAME_LENGTH, stereo);
 }
 
-
+*/

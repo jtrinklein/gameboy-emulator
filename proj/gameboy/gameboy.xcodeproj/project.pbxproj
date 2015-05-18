@@ -16,7 +16,7 @@
 		A4A153C81AF4792F00DA5F0E /* gameboy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BA1AF4792F00DA5F0E /* gameboy.cpp */; };
 		A4A153C91AF4792F00DA5F0E /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BB1AF4792F00DA5F0E /* main.cpp */; };
 		A4A153CA1AF4792F00DA5F0E /* cart.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BE1AF4792F00DA5F0E /* cart.cpp */; };
-		A4A153CB1AF4792F00DA5F0E /* render.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BF1AF4792F00DA5F0E /* render.cpp */; };
+		A4A153CB1AF4792F00DA5F0E /* gpu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4A153BF1AF4792F00DA5F0E /* gpu.cpp */; };
 		A4A153CC1AF4792F00DA5F0E /* GBCarts.c in Sources */ = {isa = PBXBuildFile; fileRef = A4A153C61AF4792F00DA5F0E /* GBCarts.c */; };
 		A4E6CAAC1AF6CCD8001429CD /* mmu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A4E6CAAA1AF6CCD8001429CD /* mmu.cpp */; };
 /* End PBXBuildFile section */
@@ -34,6 +34,7 @@
 /* Begin PBXFileReference section */
 		A43D77581AFBD864006D3FC7 /* pad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = pad.cpp; path = ../../../source/pad.cpp; sourceTree = "<group>"; };
 		A43D77591AFBD864006D3FC7 /* pad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = pad.h; path = ../../../source/pad.h; sourceTree = "<group>"; };
+		A43EF5721B06A2AD00CA604A /* logo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = logo.h; path = ../../../source/logo.h; sourceTree = "<group>"; };
 		A49364531B03AC43006540AB /* apu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = apu.cpp; path = ../../../source/apu.cpp; sourceTree = "<group>"; };
 		A49364551B03AC4D006540AB /* apu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = apu.h; path = ../../../source/apu.h; sourceTree = "<group>"; };
 		A495D97A1B010045008531ED /* cpu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cpu.cpp; path = ../../../source/cpu.cpp; sourceTree = "<group>"; };
@@ -50,8 +51,8 @@
 		A4A153BC1AF4792F00DA5F0E /* opcode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = opcode.h; path = ../../../source/opcode.h; sourceTree = "<group>"; };
 		A4A153BD1AF4792F00DA5F0E /* gameboy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gameboy.h; path = ../../../source/gameboy.h; sourceTree = "<group>"; };
 		A4A153BE1AF4792F00DA5F0E /* cart.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cart.cpp; path = ../../../source/cart.cpp; sourceTree = "<group>"; };
-		A4A153BF1AF4792F00DA5F0E /* render.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = render.cpp; path = ../../../source/render.cpp; sourceTree = "<group>"; };
-		A4A153C01AF4792F00DA5F0E /* render.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = render.h; path = ../../../source/render.h; sourceTree = "<group>"; };
+		A4A153BF1AF4792F00DA5F0E /* gpu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gpu.cpp; path = ../../../source/gpu.cpp; sourceTree = "<group>"; };
+		A4A153C01AF4792F00DA5F0E /* gpu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gpu.h; path = ../../../source/gpu.h; sourceTree = "<group>"; };
 		A4A153C11AF4792F00DA5F0E /* bios.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bios.h; path = ../../../source/bios.h; sourceTree = "<group>"; };
 		A4A153C21AF4792F00DA5F0E /* opcodeCB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = opcodeCB.h; path = ../../../source/opcodeCB.h; sourceTree = "<group>"; };
 		A4A153C31AF4792F00DA5F0E /* cart.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cart.h; path = ../../../source/cart.h; sourceTree = "<group>"; };
@@ -59,6 +60,7 @@
 		A4A153C51AF4792F00DA5F0E /* GBCarts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GBCarts.h; path = ../../../source/GBCarts.h; sourceTree = "<group>"; };
 		A4A153C61AF4792F00DA5F0E /* GBCarts.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = GBCarts.c; path = ../../../source/GBCarts.c; sourceTree = "<group>"; };
 		A4A153C71AF4792F00DA5F0E /* cycles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cycles.h; path = ../../../source/cycles.h; sourceTree = "<group>"; };
+		A4A3F80A1B066ED30049F4ED /* new_bios.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; name = new_bios.s; path = ../../../new_bios.s; sourceTree = "<group>"; };
 		A4E6CAAA1AF6CCD8001429CD /* mmu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mmu.cpp; path = ../../../source/mmu.cpp; sourceTree = "<group>"; };
 		A4E6CAAB1AF6CCD8001429CD /* mmu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mmu.h; path = ../../../source/mmu.h; sourceTree = "<group>"; };
 		A4E6CAAD1AF6CD2C001429CD /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = types.h; path = ../../../source/types.h; sourceTree = "<group>"; };
@@ -91,12 +93,13 @@
 				A4A153C71AF4792F00DA5F0E /* cycles.h */,
 				A4A153BD1AF4792F00DA5F0E /* gameboy.h */,
 				A4A153C51AF4792F00DA5F0E /* GBCarts.h */,
+				A43EF5721B06A2AD00CA604A /* logo.h */,
 				A4E6CAAB1AF6CCD8001429CD /* mmu.h */,
 				A4A153BC1AF4792F00DA5F0E /* opcode.h */,
 				A4A153C21AF4792F00DA5F0E /* opcodeCB.h */,
 				A4A153C41AF4792F00DA5F0E /* opnames.h */,
 				A43D77591AFBD864006D3FC7 /* pad.h */,
-				A4A153C01AF4792F00DA5F0E /* render.h */,
+				A4A153C01AF4792F00DA5F0E /* gpu.h */,
 				A4E6CAAD1AF6CD2C001429CD /* types.h */,
 			);
 			name = headers;
@@ -129,10 +132,11 @@
 				A495D97A1B010045008531ED /* cpu.cpp */,
 				A4A153BA1AF4792F00DA5F0E /* gameboy.cpp */,
 				A4A153C61AF4792F00DA5F0E /* GBCarts.c */,
+				A4A153BF1AF4792F00DA5F0E /* gpu.cpp */,
 				A4A153BB1AF4792F00DA5F0E /* main.cpp */,
 				A4E6CAAA1AF6CCD8001429CD /* mmu.cpp */,
 				A43D77581AFBD864006D3FC7 /* pad.cpp */,
-				A4A153BF1AF4792F00DA5F0E /* render.cpp */,
+				A4A3F80A1B066ED30049F4ED /* new_bios.s */,
 				A4A153C11AF4792F00DA5F0E /* bios.h */,
 				A4A153A11AF477C600DA5F0E /* Images.xcassets */,
 				A4A153A31AF477C600DA5F0E /* MainMenu.xib */,
@@ -268,7 +272,7 @@
 				A495D97C1B010045008531ED /* cpu.cpp in Sources */,
 				A4A153C81AF4792F00DA5F0E /* gameboy.cpp in Sources */,
 				A4A153C91AF4792F00DA5F0E /* main.cpp in Sources */,
-				A4A153CB1AF4792F00DA5F0E /* render.cpp in Sources */,
+				A4A153CB1AF4792F00DA5F0E /* gpu.cpp in Sources */,
 				A43D775A1AFBD864006D3FC7 /* pad.cpp in Sources */,
 				A4E6CAAC1AF6CCD8001429CD /* mmu.cpp in Sources */,
 				A49364541B03AC43006540AB /* apu.cpp in Sources */,

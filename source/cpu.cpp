@@ -1,7 +1,7 @@
 #include <iostream>
 #include "cpu.h"
 #include "mmu.h"
-#include "render.h"
+#include "gpu.h"
 #include "gameboy.h"
 #include "cycles.h"
 
@@ -41,11 +41,11 @@
 
 #define SBC_A(v) SUB_A((((AF.B.l & FLAG_C)?0x01:0)+v))
 
-#define AND_A(v) AF.B.h = AF.B.h & v; AF.B.l = FLAG_H|(AF.B.h?0:FLAG_Z)
+#define AND_A(v) AF.B.h &= v; AF.B.l = FLAG_H|(AF.B.h?0:FLAG_Z)
 
-#define OR_A(v) AF.B.h = AF.B.h | v; AF.B.l = (AF.B.h?0:FLAG_Z)
+#define OR_A(v) AF.B.h |= v; AF.B.l = (AF.B.h?0:FLAG_Z)
 
-#define XOR_A(v) AF.B.h = AF.B.h ^ v; AF.B.l = (AF.B.h?0:FLAG_Z)
+#define XOR_A(v) AF.B.h ^= v; AF.B.l = (AF.B.h?0:FLAG_Z)
 
 #define POP(r) r.B.l = READ(++(SP.W)); r.B.h = READ(++(SP.W))
 
@@ -58,52 +58,48 @@
 #define SET_Z(x)\
     AF.B.l |= x ? 0:FLAG_Z
 
-#define RLC_X(x)\
+#define RLC(x)\
     AF.B.l = (x&0x80)?FLAG_C:0;\
-    x = (x<<1)|((AF.B.l&FLAG_C)?0x01:0)
-
-#define RLC_X_Z(x)\
-    RLC_X(x);\
+    x = (x<<1)|((AF.B.l&FLAG_C)?0x01:0);\
     SET_Z(x)
 
-#define RL_X(x)\
+
+#define RL(x)\
     I = (x & 0x80)?FLAG_C:0;\
     x = (x<<1)|((AF.B.l&FLAG_C)?0x01:0);\
-    AF.B.l = I
-
-#define RL_X_Z(x)\
-    RL_X(x);\
+    AF.B.l = I;\
     SET_Z(x)
 
-#define RRC_X(x)\
+
+#define RRC(x)\
     AF.B.l = (x&0x01)?FLAG_C:0;\
-    x = (x>>1)|((AF.B.l&FLAG_C)?0x80:0)
-
-#define RRC_X_Z(x)\
-    RRC_X(x);\
+    x = (x>>1)|((AF.B.l&FLAG_C)?0x80:0);\
     SET_Z(x)
 
-#define RR_X(x)\
+
+
+#define RR(x)\
     I = (x & 0x01)?FLAG_C:0;\
     x = (x>>1)|((AF.B.l&FLAG_C)?0x80:0);\
-    AF.B.l = I
-
-#define RR_X_Z(x)\
-    RR_X(x);\
+    AF.B.l = I;\
     SET_Z(x)
 
+
+
 #define SLA_X(x)\
-    AF.B.l = (x & 0x80)?FLAG_C:0;\
+    AF.B.l = (x & 0x80) ? FLAG_C : 0;\
     x <<= 1;\
     SET_Z(x)
 
 #define SRA_X(x)\
+    AF.B.l = (x & 0x01) ? FLAG_C : 0;\
     x = (x>>1)|(x&0x80);\
-    AF.B.l = x?0:FLAG_Z
+    AF.B.l |= x?0:FLAG_Z
 
 #define SRL_X(x)\
+    AF.B.l = (x&0x01) ? FLAG_C : 0;\
     x >>= 1;\
-    AF.B.l = x?0:FLAG_Z
+    AF.B.l |= x?0:FLAG_Z
 
 #define SWAP_X(x)\
     x = (x>>4)|(x<<4);\
@@ -168,27 +164,58 @@ void CPU::reset() {
     WRITE(0xFF4B, 0x00) ;// WX
     WRITE(0xFFFF, 0x00) ;// IE
 }
+
+#include "opnames.h"
+#define INC(r) do {\
+    I = r;\
+    r++;\
+    /* C not affected, reset N */\
+    AF.B.l = AF.B.l & FLAG_C;\
+    AF.B.l |= (r == 0) ? FLAG_Z : 0;\
+    /* set H when 0x0F -> 0x1F */\
+    AF.B.l |= ((r & 0x0F) < (I & 0x0F)) ? FLAG_H : 0;\
+} while(false)
+
+#define DEC(r) do {\
+    I = r;\
+    r--;\
+    AF.B.l &= FLAG_C;\
+    AF.B.l |= FLAG_N;\
+    AF.B.l |= ((I & 0x0F) > (r & 0x0F)) ? FLAG_H : 0;\
+    AF.B.l |= (r == 0) ? FLAG_Z : 0;\
+} while(false)
+
+#define NEXT_WORD(d) do {\
+    d.B.l = READ_INC();\
+    d.B.h = READ_INC();\
+} while(false)
+
 void CPU::execOp(byte opcode) {
     byte I = opcode;
+    signedbyte S;
     pair J;
 
     opCycles = cycles[I];
-    intCycles -= opCycles;
 
     switch (I) {
 
+            
+            
 #include "opcode.h"
 
         default:
+            printf("opcode: 0x%02X - %s is not defined!\n", I, OpNameTable[I]);
+            powerOn = false;
             break;
     }
+            
+    intCycles -= opCycles;
 }
 
 void CPU::execCB(byte opcode) {
     byte I = opcode;
     pair J;
     opCycles += cyclesCB[I];
-    intCycles -= cyclesCB[I];
     switch (I) {
 
 #include "opcodeCB.h"
@@ -203,19 +230,16 @@ void CPU::runBios(byte *bios) {
     //byte* rom = gb->mmu->rom;
     //gb->mmu->rom = bios;
     while (gb->gpu->running() && PC.W < 0x100) {
+        if(PC.W == 0x0027) {
+            std::cout << "pc: 0x0027" << std::endl;
+        }
         step();
     }
     gb->mmu->inBios = false;
 }
 void CPU::run() {
-    while (gb->gpu->running()) {
-        if (runState == RS_STOP) {
-            stepStop();
-        } else if (runState == RS_HALT) {
-            stepHalt();
-        } else {
-            step();
-        }
+    while (powerOn && gb->gpu->running()) {
+        step();
     }
 }
 
@@ -243,12 +267,18 @@ void CPU::timerStep() {
 
     }
 }
+
 void CPU::step() {
     byte opcode =READ_INC();
     execOp(opcode);
     timerStep();
     gb->gpu->renderStep(opCycles);
+    if(intCycles <= 0) {
+        intCycles += intPeriod;
+
+    }
 }
+
 void CPU::stepHalt() {
     byte opcode =READ_INC();
     execOp(opcode);

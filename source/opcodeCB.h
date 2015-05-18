@@ -5,143 +5,143 @@
 #define END break
 
 OP(0x00) // RLC B
-    RLC_X_Z(BC.B.h);
+    RLC(BC.B.h);
 END;
 
 OP(0x01) // RLC C
-    RLC_X_Z(BC.B.l);
+    RLC(BC.B.l);
 END;
 
 OP(0x02) // RLC D
-    RLC_X_Z(DE.B.h);
+    RLC(DE.B.h);
 END;
 
 OP(0x03) // RLC E
-    RLC_X_Z(DE.B.l);
+    RLC(DE.B.l);
 END;
 
 OP(0x04) // RLC H
-    RLC_X_Z(HL.B.h);
+    RLC(HL.B.h);
 END;
 
 OP(0x05) // RLC L
-    RLC_X_Z(HL.B.l);
+    RLC(HL.B.l);
 END;
 
 OP(0x06) // RLC (HL)
     J.B.h = READ(HL.W);
-    RLC_X_Z(J.B.h);
+    RLC(J.B.h);
     WRITE(HL.W, J.B.h);
 END;
 
 OP(0x07) // RLC A
-    RLC_X_Z(AF.B.h);
+    RLC(AF.B.h);
 END;
 
 
 OP(0x10) // RL B
-    RL_X_Z(BC.B.h);
+    RL(BC.B.h);
 END;
 
 OP(0x11) // RL C
-    RL_X_Z(BC.B.l);
+    RL(BC.B.l);
 END;
 
 OP(0x12) // RL D
-    RL_X_Z(DE.B.h);
+    RL(DE.B.h);
 END;
 
 OP(0x13) // RL E
-    RL_X_Z(DE.B.l);
+    RL(DE.B.l);
 END;
 
 OP(0x14) // RL H
-    RL_X_Z(HL.B.h);
+    RL(HL.B.h);
 END;
 
 OP(0x15) // RL L
-    RL_X_Z(HL.B.l);
+    RL(HL.B.l);
 END;
 
 OP(0x16) // RL (HL)
     J.B.h = READ(HL.W);
-    RL_X_Z(J.B.h);
+    RL(J.B.h);
     WRITE(HL.W, J.B.h);
 END;
 
 OP(0x17) // RL A
-    RL_X_Z(AF.B.h);
+    RL(AF.B.h);
 END;
 
 
 
 OP(0x08) // RRC B
-    RRC_X_Z(BC.B.h);
+    RRC(BC.B.h);
 END;
 
 OP(0x09) // RRC C
-    RRC_X_Z(BC.B.l);
+    RRC(BC.B.l);
 END;
 
 OP(0x0A) // RRC D
-    RRC_X_Z(DE.B.h);
+    RRC(DE.B.h);
 END;
 
 OP(0x0B) // RRC E
-    RRC_X_Z(DE.B.l);
+    RRC(DE.B.l);
 END;
 
 OP(0x0C) // RRC H
-    RRC_X_Z(HL.B.h);
+    RRC(HL.B.h);
 END;
 
 OP(0x0D) // RRC L
-    RRC_X_Z(HL.B.l);
+    RRC(HL.B.l);
 END;
 
 OP(0x0E) // RRC (HL)
     J.B.h = READ(HL.W);
-    RRC_X_Z(J.B.h);
+    RRC(J.B.h);
     WRITE(HL.W, J.B.h);
 END;
 
 OP(0x0F) // RRC A
-    RRC_X_Z(AF.B.h);
+    RRC(AF.B.h);
 END;
 
 
 OP(0x18) // RR B
-    RR_X_Z(BC.B.h);
+    RR(BC.B.h);
 END;
 
 OP(0x19) // RR C
-    RR_X_Z(BC.B.l);
+    RR(BC.B.l);
 END;
 
 OP(0x1A) // RR D
-    RR_X_Z(DE.B.h);
+    RR(DE.B.h);
 END;
 
 OP(0x1B) // RR E
-    RR_X_Z(DE.B.l);
+    RR(DE.B.l);
 END;
 
 OP(0x1C) // RR H
-    RR_X_Z(HL.B.h);
+    RR(HL.B.h);
 END;
 
 OP(0x1D) // RR L
-    RR_X_Z(HL.B.l);
+    RR(HL.B.l);
 END;
 
 OP(0x1E) // RR (HL)
     J.B.h = READ(HL.W);
-    RR_X_Z(J.B.h);
+    RR(J.B.h);
     WRITE(HL.W, J.B.h);
 END;
 
 OP(0x1F) // RR A
-    RR_X_Z(AF.B.h);
+    RR(AF.B.h);
 END;
 
 
