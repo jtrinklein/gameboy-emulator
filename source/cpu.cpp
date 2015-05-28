@@ -71,11 +71,11 @@
     SET_Z(x)
 
 
-#define RRC(x)\
+#define RRC(x) do {\
     AF.B.l = (x&0x01)?FLAG_C:0;\
-    x = (x>>1)|((AF.B.l&FLAG_C)?0x80:0);\
-    SET_Z(x)
-
+    x >>= (x>>1)|((AF.B.l&FLAG_C)?0x80:0);\
+    SET_Z(x);\
+} while(false)
 
 
 #define RR(x)\
@@ -227,14 +227,15 @@ void CPU::execCB(byte opcode) {
 void CPU::runBios(byte *bios) {
     PC.W = 0;
     gb->mmu->inBios = true;
-    //byte* rom = gb->mmu->rom;
-    //gb->mmu->rom = bios;
+    byte* rom = gb->mmu->rom;
+    gb->mmu->rom = bios;
     while (gb->gpu->running() && PC.W < 0x100) {
-        if(PC.W == 0x0027) {
-            std::cout << "pc: 0x0027" << std::endl;
+        if(PC.W == 0xF5) {
+            std::cout << "";
         }
         step();
     }
+    gb->mmu->rom = rom;
     gb->mmu->inBios = false;
 }
 void CPU::run() {
@@ -268,15 +269,38 @@ void CPU::timerStep() {
     }
 }
 
+void CPU::handleInterrupt(byte interrupt, word vector) {
+    IME = IE_DISABLED;
+    gb->mmu->IF &= ~(interrupt);
+    //CALL nn
+    PUSH(PC);
+    PC.W = vector;
+}
+
 void CPU::step() {
+    
+    
+    if (IME == IE_ENABLED) {
+        byte irq = gb->mmu->IE & gb->mmu->IF;
+        if (irq & IR_VBLANK) {
+            handleInterrupt(IR_VBLANK, IRV_VBLANK);
+        } else if (irq & IR_LCD) {
+            handleInterrupt(IR_LCD, IRV_LCDC);
+        } else if (irq & IR_TIMER) {
+            handleInterrupt(IR_TIMER, IRV_TIMER);
+        } else if (irq & IR_SERIAL) {
+            handleInterrupt(IR_SERIAL, IRV_SERIAL);
+        } else if (irq & IR_JOYPAD) {
+            handleInterrupt(IR_JOYPAD, IRV_JOYPAD);
+        }
+
+    }
     byte opcode =READ_INC();
     execOp(opcode);
     timerStep();
+    
     gb->gpu->renderStep(opCycles);
-    if(intCycles <= 0) {
-        intCycles += intPeriod;
-
-    }
+    
 }
 
 void CPU::stepHalt() {

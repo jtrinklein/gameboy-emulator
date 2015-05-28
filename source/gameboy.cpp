@@ -78,24 +78,37 @@ void Gameboy::run() {
     cpu->run();
 }
 
+#include "testdaa.h"
 void go(bool skipBios) {
 //    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/cpu_instrs/cpu_instrs.gb";
 //    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/cpu_instrs/individual/01-special.gb";
 //    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/
     std::string biosPath = "/Users/jtrinklein/src/gameboy/emulator/roms/bios.bin";
     std::string path = "/Users/jtrinklein/src/gameboy/emulator/roms/";
+    /**/    path += "cpu_instrs/individual/01-special.gb";
+    //**/    path += "cpu_instrs/individual/02-interrupts.gb";
+    //**/    path += "cpu_instrs/individual/03-op sp,hl.gb";
+    //**/    path += "cpu_instrs/individual/04-op r,imm.gb";
+    //**/    path += "cpu_instrs/individual/05-op rp.gb";
     //**/    path += "cpu_instrs/individual/06-ld r,r.gb";
+    //**/    path += "cpu_instrs/individual/07-jr,jp,call,ret,rst.gb";
+    //**/    path += "cpu_instrs/individual/08-misc instrs.gb";
+    //**/    path += "cpu_instrs/individual/09-op r,r.gb";
+    //**/    path += "cpu_instrs/individual/10-bit ops.gb";
+    //**/    path += "cpu_instrs/individual/11-op a,(hl).gb";
     //**/    path += "cpu_instrs/cpu_instrs.gb";
     //**/    path += "mem_timing/mem_timing.gb";
 
-    /**/    path += "cpu_instrs/individual/01-special.gb";
 
-    //**/    path += "cpu_instrs/individual/10-bit ops.gb";
+
+
+    //**/    path += "vblank.gb";
+    //**/    path += "joypad.gb";
     //**/    path += "blocks.gb";
 //**/    path += "test.gb";
-//**/    path += "cpu_instrs/individual/03-op sp,hl.gb";
-//**/   path += "instr_timing/instr_timing.gb";
-    
+
+    //**/   path += "instr_timing/instr_timing.gb";
+
     LOG_INFO("create Gameboy");
     Gameboy* gb = new Gameboy();
     LOG_INFO("init cpu");
@@ -104,9 +117,12 @@ void go(bool skipBios) {
     LOG_INFO(path.c_str());
     gb->loadCart(path.c_str());
 
-    /*if(!skipBios){
-        gb->runBios(biosPath.c_str());
-    }*/
+    //if(!skipBios){
+    //    gb->runBios(biosPath.c_str());
+    //}
+
+    testDAA(gb);
+
 
     LOG_INFO("check graphic");
     if(!gb->mmu->cart->isLogoValid) {

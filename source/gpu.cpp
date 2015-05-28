@@ -9,7 +9,7 @@
 #define PIXEL_HEIGHT 144
 #define WINDOW_SCALE 3
 
-#define NO_LCD 1
+//#define NO_LCD 1
 using namespace irr;
 
 static u32 transparentColor = PIXEL_WHITE;
@@ -308,7 +308,7 @@ void GPU::renderStep(byte cycleDelta) {
                     mode = MODE_VBLANK;
                     drawScreen();
                     
-                    gb->mmu->IF |= IR_LCD;
+                    gb->mmu->IF |= IR_VBLANK;
                     
                     if ((gb->mmu->IE & IR_LCD) && (LCD & STAT_MODE_VBLANK_IRQ_ENABLED)) {
                         gb->mmu->IF |= IR_LCD;

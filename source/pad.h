@@ -21,6 +21,7 @@ public:
     void bindLeft(byte irrKey);
     void bindRight(byte irrKey);
 
+    Gameboy* gb;
     byte JoyToKey[3][9];
     byte KeyToJoy[0xFF];
     byte src[0xFF];

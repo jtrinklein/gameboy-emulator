@@ -23,6 +23,7 @@ public:
     void gpuStep();
 
     void interruptCheck();
+    void handleInterrupt(byte interrupt, word vector);
 
     Gameboy *gb;
     byte IME;

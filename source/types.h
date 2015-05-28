@@ -15,6 +15,12 @@
 #define INT_NONE    0xFFFF     /* No interrupt required      */
 #define INT_QUIT    0xFFFE     /* Exit the emulation         */
 
+#define IRV_VBLANK  0x0040
+#define IRV_LCDC    0x0048
+#define IRV_TIMER   0x0050
+#define IRV_SERIAL  0x0058
+#define IRV_JOYPAD  0x0060
+
 /* Bits in Z80 F register:    */
 #define FLAG_Z      0x80       /* 1: Result is zero          */
 #define FLAG_N      0x40       /* 1: Subtraction occured     */
@@ -35,8 +41,8 @@
 #define IR_JOYPAD   0x10
 
 #define INPUT_SRC_MASK   0x30
-#define INPUT_SRC_DPAD   0x10
-#define INPUT_SRC_BTNS   0x20
+#define INPUT_SRC_DPAD   0x20
+#define INPUT_SRC_BTNS   0x10
 
 #define INPUT_RIGHT      0x01
 #define INPUT_LEFT       0x02
@@ -45,8 +51,8 @@
 
 #define INPUT_BTN_A      0x01
 #define INPUT_BTN_B      0x02
-#define INPUT_BTN_START  0x04
-#define INPUT_BTN_SELECT 0x08
+#define INPUT_BTN_SELECT 0x04
+#define INPUT_BTN_START  0x08
 
 
 #define LCD_COINCIDENCE                 0x04

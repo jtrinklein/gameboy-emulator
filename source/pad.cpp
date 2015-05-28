@@ -2,11 +2,12 @@
 #include "irrlicht.h"
 #include "gameboy.h"
 #include "mmu.h"
+#include "cpu.h"
 #include <iostream>
 
 using namespace irr;
-Pad::Pad(Gameboy* gb) {
-    
+Pad::Pad(Gameboy* g) {
+    gb = g;
     std::cout << "PAD - ctor" << std::endl;
     mmu = gb->mmu;
     mmu->keys[0] = 0;
@@ -100,16 +101,25 @@ void Pad::bindRight(byte irrKey){
 }
 
 bool Pad::OnEvent(const SEvent& event) {
+    bool interrupt = false;
     if(event.EventType == EET_KEY_INPUT_EVENT) {
 
         byte key = event.KeyInput.Key;
 
         if (event.KeyInput.PressedDown) {
-            mmu->keys[src[key]] |= KeyToJoy[key];
+            byte k = mmu->keys[src[key]];
+            byte j =  KeyToJoy[key];
+            if ((k&j) == 0) {
+                mmu->keys[src[key]] |= j;
+                interrupt = true;
+            }
         } else {
             mmu->keys[src[key]] &= ~(KeyToJoy[key]);
+            interrupt = true;
         }
-        return true;
+        if (interrupt) {
+            gb->mmu->IF |= IR_JOYPAD;
+        }
     }
-    return false;
+    return interrupt;
 }

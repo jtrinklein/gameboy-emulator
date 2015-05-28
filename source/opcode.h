@@ -16,10 +16,40 @@ OP(0x10) // STOP
 END
 
 OP(0x27) // DAA
-    I = AF.B.h;
-    AF.B.h += (((AF.B.h&0x0F)>0x09)||(AF.B.l&FLAG_H)) ? 0x06 : 0;
-    AF.B.h += (((AF.B.h&0xF0)>0x90)||(AF.B.l&FLAG_C)) ? 0x60 : 0;
-    AF.B.l = (AF.B.l&FLAG_N) | (AF.B.h?0:FLAG_Z)| (I > AF.B.h?FLAG_C:0);
+{
+
+    int a = AF.B.h;
+    if( (AF.B.l & FLAG_N) == 0) {
+
+        if ((a & 0x0F) > 0x09 || (AF.B.l & FLAG_H)) {
+            a += 0x06;
+        }
+        if(a > 0x9F || (AF.B.l & FLAG_C)) {
+            a += 0x60;
+        }
+
+    } else {
+        if(AF.B.l & FLAG_H) {
+            a = (a-6) & 0xFF;
+        }
+        if(AF.B.l & FLAG_C) {
+            a -= 0x60;
+        }
+    }
+
+    AF.B.l &= ~(FLAG_H | FLAG_Z);
+
+    if(a & 0x100) {
+        AF.B.l |= FLAG_C;
+    }
+    a &= 0xFF;
+    if(a == 0x00) {
+        AF.B.l |= FLAG_Z;
+    }
+
+    AF.B.h = (byte)a;
+
+}
 END
 
 // LD (xx), A
@@ -1081,8 +1111,12 @@ OP(0xE0) // LDH (n), A
     WRITE(0xFF00+READ_INC(), AF.B.h);
 END
 
-OP(0xF0) // LD A, (n)
-    AF.B.h = READ(0xFF00+READ_INC());
+OP(0xF0) // LDH A, (n)
+    I = READ_INC();
+if (I >= 0x80) {
+    std::cout << "";
+}
+    AF.B.h = READ(0xFF00+I);
 END
 
 
@@ -1160,11 +1194,11 @@ OP(0xDC) // CALL C, nn
 END
 
 // Interrupt Enable/disable
-OP(0xF3) // ID
+OP(0xF3) // DI
     IME = IE_DISABLED;
 END
 
-OP(0xFB) // IE
+OP(0xFB) // EI
     IME = IE_ENABLED;
 END
 
