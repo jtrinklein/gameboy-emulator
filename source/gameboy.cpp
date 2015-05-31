@@ -78,7 +78,6 @@ void Gameboy::run() {
     cpu->run();
 }
 
-#include "testdaa.h"
 void go(bool skipBios) {
 //    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/cpu_instrs/cpu_instrs.gb";
 //    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/cpu_instrs/individual/01-special.gb";
@@ -117,8 +116,6 @@ void go(bool skipBios) {
     //if(!skipBios){
     //    gb->runBios(biosPath.c_str());
     //}
-
-    testDAA(gb);
 
 
     LOG_INFO("check graphic");
