@@ -47,9 +47,19 @@
 
 #define XOR_A(v) AF.B.h ^= v; AF.B.l = (AF.B.h?0:FLAG_Z)
 
-#define POP(r) r.B.l = READ(++(SP.W)); r.B.h = READ(++(SP.W))
+#define POP(r) do {\
+    r.B.l = READ(SP.W);\
+    SP.W++;\
+    r.B.h = READ(SP.W);\
+    SP.W++;\
+} while(false)
 
-#define PUSH(r) WRITE(SP.W--, r.B.h); WRITE(SP.W--, r.B.l)
+#define PUSH(r) do {\
+    SP.W--;\
+    WRITE(SP.W, r.B.h);\
+    SP.W--;\
+    WRITE(SP.W, r.B.l);\
+} while(false)
 
 #define RET() POP(J); PC.W = J.W
 
@@ -124,6 +134,7 @@ CPU::~CPU() {
 }
 
 void CPU::reset() {
+    timerTicks = 0;
     PC.W = 0x100;
     AF.B.h = 0x01;
     AF.B.l = 0xB0;
@@ -199,8 +210,8 @@ void CPU::execOp(byte opcode) {
 
     switch (I) {
 
-            
-            
+
+
 #include "opcode.h"
 
         default:
@@ -208,7 +219,7 @@ void CPU::execOp(byte opcode) {
             powerOn = false;
             break;
     }
-            
+
     intCycles -= opCycles;
 }
 
@@ -250,12 +261,13 @@ void CPU::timerStep() {
     byte machineCycles = opCycles >> 2;
     timerTicks += machineCycles;
 
-    if(timerTicks >= 4) {
+    while(timerTicks >= 4) {
         timerTicks -= 4;
         timer++;
-        if (gb->mmu->tac & 0x4 && timerTicks >= timerSpeed[gb->mmu->tac & 0x3]) {
-            timerTicks -= timerSpeed[gb->mmu->tac & 0x3];
-            if (++(gb->mmu->tima) == 0) {
+        if (gb->mmu->tac & 0x4 && timer >= timerSpeed[gb->mmu->tac & 0x3]) {
+            timer = 0;
+            gb->mmu->tima++;
+            if (gb->mmu->tima == 0) {
                 gb->mmu->tima = gb->mmu->tma;
                 gb->mmu->IF |= IR_TIMER;
             }
@@ -275,11 +287,13 @@ void CPU::handleInterrupt(byte interrupt, word vector) {
     //CALL nn
     PUSH(PC);
     PC.W = vector;
+    opCycles = cycles[0xCD];
+    timerStep();
 }
 
 void CPU::step() {
-    
-    
+
+
     if (IME == IE_ENABLED) {
         byte irq = gb->mmu->IE & gb->mmu->IF;
         if (irq & IR_VBLANK) {
@@ -298,9 +312,9 @@ void CPU::step() {
     byte opcode =READ_INC();
     execOp(opcode);
     timerStep();
-    
+
     gb->gpu->renderStep(opCycles);
-    
+
 }
 
 void CPU::stepHalt() {

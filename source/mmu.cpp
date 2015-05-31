@@ -51,7 +51,7 @@ MMU::~MMU() {
 
 
 void MMU::reset() {
-    
+
     std::cout << "MMU - reset" << std::endl;
     if (cart != nullptr) {
         delete cart;
@@ -183,9 +183,8 @@ byte MMU::read(word A) {
                             default:
                                 break;
 
-                                // 0xFF00 - 0xFF7F is IO, not handled yet
                         }
-                        return 0; // handled on CPU
+                        return 0;
                     }
                     // 0xFF00 - 0xFF7F is IO, not handled yet
                     return 0;
@@ -389,21 +388,13 @@ void MMU::write(word addr,byte val) {
 
 void MMU::writeSerial() {
 
-    if(serialBuffer == 0x8E) {
-        std::cout << std::endl;
-        scount = 0;
-    } else {
-        std::cout << serialBuffer;
-        if(++scount == 80) {
-            std::cout << std::endl;
-            scount = 0;
-        }
-    }
+    std::cout << serialBuffer;
+    
 }
 
 
 void MMU::loadCart(const char *path) {
-    
+
     std::cout << "MMU - Load cart" << std::endl;
     cart = new Cart(path);
     if(cart->loadOk) {

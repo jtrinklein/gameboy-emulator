@@ -85,7 +85,7 @@ void go(bool skipBios) {
 //    const char *file = "/Users/jtrinklein/src/gameboy/emulator/roms/
     std::string biosPath = "/Users/jtrinklein/src/gameboy/emulator/roms/bios.bin";
     std::string path = "/Users/jtrinklein/src/gameboy/emulator/roms/";
-    /**/    path += "cpu_instrs/individual/01-special.gb";
+    //**/    path += "cpu_instrs/individual/01-special.gb";
     //**/    path += "cpu_instrs/individual/02-interrupts.gb";
     //**/    path += "cpu_instrs/individual/03-op sp,hl.gb";
     //**/    path += "cpu_instrs/individual/04-op r,imm.gb";
@@ -95,13 +95,10 @@ void go(bool skipBios) {
     //**/    path += "cpu_instrs/individual/08-misc instrs.gb";
     //**/    path += "cpu_instrs/individual/09-op r,r.gb";
     //**/    path += "cpu_instrs/individual/10-bit ops.gb";
-    //**/    path += "cpu_instrs/individual/11-op a,(hl).gb";
+    /**/    path += "cpu_instrs/individual/11-op a,(hl).gb";
     //**/    path += "cpu_instrs/cpu_instrs.gb";
     //**/    path += "mem_timing/mem_timing.gb";
-
-
-
-
+    //**/    path += "02-interrupts.gb";
     //**/    path += "vblank.gb";
     //**/    path += "joypad.gb";
     //**/    path += "blocks.gb";
