@@ -1,0 +1,2 @@
+#!/bin/zsh
+wla-gb -o $1.s test.o && wlalink linkfile ../../$1.gb
